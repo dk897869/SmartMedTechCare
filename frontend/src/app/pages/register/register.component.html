@@ -1,92 +1,169 @@
-<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 350px);">
-  <div class="card glass-card border-0 p-4 py-5 shadow w-100 animate-fade-in-up" style="max-width: 460px; border-radius: 24px;">
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 250px);">
+  <div class="card glass-card border-0 p-4 py-5 shadow w-100 animate-fade-in-up" style="max-width: 480px; border-radius: 24px;">
     <div class="text-center mb-4">
       <div class="d-inline-flex rounded-circle p-3 mb-2" style="background-color: rgba(16, 185, 129, 0.08); color: #10b981;">
-        <span class="material-icons" style="font-size: 2.2rem;">assignment_ind</span>
+        <span class="material-icons" style="font-size: 2.2rem;">shield</span>
       </div>
-      <h3 class="fw-bold text-dark mt-2">Create Account</h3>
-      <p class="text-muted small">Begin using our intelligent diagnosis services and medicine compare tools.</p>
+      <h3 class="fw-bold text-dark mt-2">Secure Signup</h3>
+      <p class="text-muted small">Verify your email and mobile phone number to activate your account.</p>
     </div>
 
-    <!-- Google Sign-Up Button -->
-    <button type="button" class="btn-google mb-3" (click)="loginWithGoogle()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.5 24c0-1.63-.15-3.2-.43-4.75H24v9h12.75c-.55 2.87-2.18 5.31-4.62 6.94l7.2 5.58C43.5 35.53 46.5 30.22 46.5 24z"/>
-        <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.98-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.2-5.58c-2 1.34-4.55 2.14-8.69 2.14-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      <span>Sign Up with Google</span>
-    </button>
+    <!-- Google Sign-Up Button (Shown only before OTP dispatch to keep screen focused) -->
+    @if (!otpSent) {
+      <button type="button" class="btn-google mb-3" (click)="loginWithGoogle()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24c0-1.63-.15-3.2-.43-4.75H24v9h12.75c-.55 2.87-2.18 5.31-4.62 6.94l7.2 5.58C43.5 35.53 46.5 30.22 46.5 24z"/>
+          <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.98-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.2-5.58c-2 1.34-4.55 2.14-8.69 2.14-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Sign Up with Google</span>
+      </button>
 
-    <div class="d-flex align-items-center mb-3">
-      <hr class="flex-grow-1 border-secondary-subtle">
-      <span class="mx-2 text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">or sign up with email</span>
-      <hr class="flex-grow-1 border-secondary-subtle">
-    </div>
+      <div class="d-flex align-items-center mb-3">
+        <hr class="flex-grow-1 border-secondary-subtle">
+        <span class="mx-2 text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">or fill credentials</span>
+        <hr class="flex-grow-1 border-secondary-subtle">
+      </div>
+    }
 
     <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-      <!-- Full Name -->
-      <div class="mb-3">
-        <label for="name" class="form-label fw-semibold text-secondary small">Full Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          class="form-control glass-input w-100"
-          placeholder="Jane Doe"
-          [(ngModel)]="name"
-          required
-        />
-      </div>
+      
+      <!-- STEP 1: Enter Profile Details -->
+      @if (!otpSent) {
+        <!-- Full Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold text-secondary small">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="form-control glass-input w-100"
+            placeholder="Jane Doe"
+            [(ngModel)]="name"
+            required
+          />
+        </div>
 
-      <!-- Email Field -->
-      <div class="mb-3">
-        <label for="email" class="form-label fw-semibold text-secondary small">Email Address</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          class="form-control glass-input w-100"
-          placeholder="jane.doe@example.com"
-          [(ngModel)]="email"
-          required
-        />
-      </div>
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold text-secondary small">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control glass-input w-100"
+            placeholder="jane.doe@example.com"
+            [(ngModel)]="email"
+            required
+          />
+        </div>
 
-      <!-- Password Field -->
-      <div class="mb-3">
-        <label for="password" class="form-label fw-semibold text-secondary small">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          class="form-control glass-input w-100"
-          placeholder="••••••••"
-          [(ngModel)]="password"
-          required
-        />
-      </div>
+        <!-- Phone Field -->
+        <div class="mb-3">
+          <label for="phone" class="form-label fw-semibold text-secondary small">Mobile Phone Number</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            class="form-control glass-input w-100"
+            placeholder="e.g. +919876543210"
+            [(ngModel)]="phone"
+            required
+          />
+        </div>
 
-      <!-- Role Selection -->
-      <div class="mb-4">
-        <label for="role" class="form-label fw-semibold text-secondary small">Account Type (For Review Testing)</label>
-        <select id="role" name="role" class="form-select glass-input w-100" [(ngModel)]="role">
-          <option value="user">Patient (Standard User)</option>
-          <option value="admin">Pharmacist / Administrator (Admin)</option>
-        </select>
-      </div>
+        <!-- Password Field -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold text-secondary small">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control glass-input w-100"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            required
+          />
+        </div>
 
-      <!-- Submit Button -->
-      <button type="submit" class="btn btn-teal-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2" [disabled]="isLoading()">
-        @if (isLoading()) {
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          <span>Registering account...</span>
-        } @else {
-          <span class="material-icons" style="font-size: 1.25rem;">how_to_reg</span>
-          <span>Sign Up</span>
-        }
-      </button>
+        <!-- Role Selection -->
+        <div class="mb-4">
+          <label for="role" class="form-label fw-semibold text-secondary small">Account Type</label>
+          <select id="role" name="role" class="form-select glass-input w-100" [(ngModel)]="role">
+            <option value="user">Patient (Standard User)</option>
+            <option value="admin">Pharmacist / Administrator (Admin)</option>
+          </select>
+        </div>
+
+        <!-- Action Button: Send Codes -->
+        <button type="button" class="btn btn-teal-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2" 
+                [disabled]="isSendingOtp()" (click)="sendVerificationCode()">
+          @if (isSendingOtp()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Sending Verification OTPs...</span>
+          } @else {
+            <span class="material-icons" style="font-size: 1.25rem;">sms</span>
+            <span>Send Verification Codes</span>
+          }
+        </button>
+      }
+
+      <!-- STEP 2: Verify Codes -->
+      @if (otpSent) {
+        <div class="alert alert-info py-2 small mb-3 border-info-subtle">
+          🚀 Codes dispatched to <strong>{{ email }}</strong> and SMS to <strong>{{ phone }}</strong>.
+        </div>
+
+        <!-- Email OTP Code -->
+        <div class="mb-3">
+          <label for="emailOtp" class="form-label fw-semibold text-secondary small">6-Digit Email Verification Code</label>
+          <input
+            type="text"
+            id="emailOtp"
+            name="emailOtp"
+            class="form-control glass-input text-center fw-bold letter-spacing-3 w-100"
+            style="letter-spacing: 5px; font-size: 1.2rem;"
+            placeholder="000000"
+            maxlength="6"
+            [(ngModel)]="emailOtp"
+            required
+          />
+        </div>
+
+        <!-- SMS OTP Code -->
+        <div class="mb-4">
+          <label for="smsOtp" class="form-label fw-semibold text-secondary small">6-Digit SMS Verification Code</label>
+          <input
+            type="text"
+            id="smsOtp"
+            name="smsOtp"
+            class="form-control glass-input text-center fw-bold letter-spacing-3 w-100"
+            style="letter-spacing: 5px; font-size: 1.2rem;"
+            placeholder="000000"
+            maxlength="6"
+            [(ngModel)]="smsOtp"
+            required
+          />
+        </div>
+
+        <!-- Submit Registration -->
+        <button type="submit" class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Validating Codes & Registering...</span>
+          } @else {
+            <span class="material-icons" style="font-size: 1.25rem;">verified_user</span>
+            <span>Verify Codes & Sign Up</span>
+          }
+        </button>
+
+        <div class="text-center mt-3">
+          <button type="button" class="btn btn-link text-teal small p-0 fw-semibold" (click)="sendVerificationCode()">
+            Didn't receive codes? Resend OTPs
+          </button>
+        </div>
+      }
 
       <!-- Toggle Mode Link -->
       <div class="text-center mt-4">

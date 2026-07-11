@@ -26,7 +26,7 @@ export class AuthService {
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
 
-  constructor(private readonly api: ApiService) {
+  constructor(public readonly api: ApiService) {
     this.loadCachedUser();
   }
 
@@ -41,6 +41,10 @@ export class AuthService {
         }
       }
     }
+  }
+
+  sendOtp(email: string, phone: string): Observable<any> {
+    return this.api.post<any>('auth/send-otp', { email, phone });
   }
 
   register(userData: any): Observable<UserResponse> {
@@ -93,6 +97,16 @@ export class AuthService {
           if (typeof window !== 'undefined') {
             localStorage.setItem('user', JSON.stringify(updatedUser));
           }
+        }
+      })
+    );
+  }
+
+  deleteProfile(): Observable<any> {
+    return this.api.delete<any>('auth/profile').pipe(
+      tap((res) => {
+        if (res.success) {
+          this.logout();
         }
       })
     );

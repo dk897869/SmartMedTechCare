@@ -146,45 +146,69 @@ export class CheckoutComponent implements OnInit {
     });
 
     setTimeout(() => {
-      // Create order payload
-      const orderPayload = {
-        pharmacyId: this.selectedPharmacy()._id,
-        items: this.items().map(item => ({
+      // Group items by pharmacyId
+      const groupedItems: { [pharmacyId: string]: any[] } = {};
+      for (const item of this.items()) {
+        if (!groupedItems[item.pharmacyId]) {
+          groupedItems[item.pharmacyId] = [];
+        }
+        groupedItems[item.pharmacyId].push({
           medicineId: item.medicineId,
           quantity: item.quantity
-        })),
-        paymentMethod: this.paymentMethod,
-        shippingAddress: this.shippingAddress
-      };
+        });
+      }
 
-      this.apiService.post<any>('orders', orderPayload).subscribe({
-        next: (res) => {
+      const pharmacyIds = Object.keys(groupedItems);
+      const orderPromises: Promise<any>[] = [];
+
+      for (const pId of pharmacyIds) {
+        const payload = {
+          pharmacyId: pId,
+          items: groupedItems[pId],
+          paymentMethod: this.paymentMethod,
+          shippingAddress: this.shippingAddress
+        };
+        
+        const orderPromise = new Promise((resolve, reject) => {
+          this.apiService.post<any>('orders', payload).subscribe({
+            next: (res) => resolve(res),
+            error: (err) => reject(err)
+          });
+        });
+        orderPromises.push(orderPromise);
+      }
+
+      Promise.all(orderPromises)
+        .then((results: any[]) => {
           Swal.close();
           this.isPlacingOrder.set(false);
-          if (res.success) {
-            Swal.fire({
-              title: 'Payment Successful!',
-              text: 'Your order has been confirmed and is being packaged.',
-              icon: 'success',
-              confirmButtonText: 'Track Order',
-              confirmButtonColor: '#0d9488'
-            }).then(() => {
-              this.cartService.clearCart();
-              this.router.navigate([`/orders/${res.data._id}/track`]);
-            });
-          }
-        },
-        error: (err) => {
+          const firstOrderId = results[0]?.data?._id;
+
+          Swal.fire({
+            title: 'Payment Successful!',
+            text: `Placed ${results.length} order(s) successfully! Preparing your delivery packages.`,
+            icon: 'success',
+            confirmButtonText: 'Track Order',
+            confirmButtonColor: '#10b981'
+          }).then(() => {
+            this.cartService.clearCart();
+            if (firstOrderId) {
+              this.router.navigate([`/orders/${firstOrderId}/track`]);
+            } else {
+              this.router.navigate(['/orders']);
+            }
+          });
+        })
+        .catch((err) => {
           Swal.close();
           this.isPlacingOrder.set(false);
           Swal.fire({
             title: 'Order Placement Failed',
             text: err.error?.message || 'Stock limits or connection issues occurred.',
             icon: 'error',
-            confirmButtonColor: '#0d9488'
+            confirmButtonColor: '#ef4444'
           });
-        }
-      });
+        });
     }, 2500); // 2.5s payment sim
   }
 }

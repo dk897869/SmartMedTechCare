@@ -48,6 +48,16 @@ interface Pharmacy {
   name: string;
 }
 
+interface ContactQuery {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   imports: [FormsModule, RouterLink, DatePipe],
@@ -59,6 +69,7 @@ export class AdminDashboardComponent implements OnInit {
   readonly orders = signal<Order[]>([]);
   readonly medicines = signal<Medicine[]>([]);
   readonly pharmacies = signal<Pharmacy[]>([]);
+  readonly contacts = signal<ContactQuery[]>([]);
   
   readonly isLoading = signal(true);
 
@@ -75,7 +86,7 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Guards check
+    // Role Authorization Guard Check
     if (!this.authService.isLoggedIn() || !this.authService.isAdmin()) {
       Swal.fire({
         title: 'Access Denied',
@@ -90,6 +101,7 @@ export class AdminDashboardComponent implements OnInit {
     this.fetchDashboardStats();
     this.fetchOrders();
     this.fetchMedicinesAndPharmacies();
+    this.fetchContactQueries();
   }
 
   fetchDashboardStats() {
@@ -117,14 +129,24 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  fetchContactQueries() {
+    this.apiService.get<any>('contacts').subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.contacts.set(res.data);
+        }
+      }
+    });
+  }
+
   fetchMedicinesAndPharmacies() {
-    // Fetch plain lists for selection in inventory modifier
     this.apiService.get<any>('medicines').subscribe({
       next: (res) => {
         if (res.success) this.medicines.set(res.data);
       }
     });
 
+    // Fetch CP pharmacies for select options
     this.apiService.get<any>('pharmacies/nearby', { lat: 28.6139, lng: 77.2090 }).subscribe({
       next: (res) => {
         if (res.success) this.pharmacies.set(res.data);
@@ -139,7 +161,7 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, Update',
-      confirmButtonColor: '#0d9488'
+      confirmButtonColor: '#10b981'
     }).then((result) => {
       if (result.isConfirmed) {
         this.apiService.put<any>(`admin/orders/${orderId}/status`, { status }).subscribe({
@@ -168,7 +190,7 @@ export class AdminDashboardComponent implements OnInit {
         title: 'Form Incomplete',
         text: 'Please select both a pharmacy and a medicine.',
         icon: 'error',
-        confirmButtonColor: '#0d9488'
+        confirmButtonColor: '#10b981'
       });
       return;
     }
@@ -187,7 +209,7 @@ export class AdminDashboardComponent implements OnInit {
             title: 'Inventory Updated!',
             text: 'Pricing and stock variations are now active in the client comparison sheets.',
             icon: 'success',
-            confirmButtonColor: '#0d9488'
+            confirmButtonColor: '#10b981'
           });
           // Reset form fields
           this.selectedMedicineId = '';
@@ -200,7 +222,7 @@ export class AdminDashboardComponent implements OnInit {
           title: 'Update Failed',
           text: err.error?.message || 'Inventory update failed.',
           icon: 'error',
-          confirmButtonColor: '#0d9488'
+          confirmButtonColor: '#10b981'
         });
       }
     });

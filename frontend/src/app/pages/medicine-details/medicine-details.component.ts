@@ -99,10 +99,13 @@ export class MedicineDetailsComponent implements OnInit {
         title: 'Out of Stock',
         text: 'This pharmacy does not have sufficient stock at this moment.',
         icon: 'error',
-        confirmButtonColor: '#0d9488'
+        confirmButtonColor: '#10b981'
       });
       return;
     }
+
+    // Deduct stock locally in real-time
+    listing.stock -= 1;
 
     this.cartService.addToCart(med, listing.price, listing.pharmacyId);
     

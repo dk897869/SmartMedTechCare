@@ -36,4 +36,4 @@ const InventorySchema = new mongoose.Schema(
 // Create compound index for unique pharmacy-medicine pairs
 InventorySchema.index({ pharmacyId: 1, medicineId: 1 }, { unique: true });
 
-module.exports = mongoose.model("Inventory", InventorySchema);
+module.exports = mongoose.model("Inventory", InventorySchema, "inventories");

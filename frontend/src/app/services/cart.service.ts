@@ -7,6 +7,9 @@ export interface CartItem {
   image: string;
   price: number;
   quantity: number;
+  pharmacyId: string;
+  pharmacyName: string;
+  pharmacyAddress?: string;
 }
 
 @Injectable({
@@ -14,7 +17,6 @@ export interface CartItem {
 })
 export class CartService {
   readonly items = signal<CartItem[]>([]);
-  readonly selectedPharmacy = signal<any | null>(null);
 
   // Computeds
   readonly cartCount = computed(() => {
@@ -25,6 +27,17 @@ export class CartService {
     return this.items().reduce((acc, item) => acc + (item.price * item.quantity), 0);
   });
 
+  // Backward compatibility fallback to first item's pharmacy
+  readonly selectedPharmacy = computed(() => {
+    const list = this.items();
+    if (list.length === 0) return null;
+    return {
+      _id: list[0].pharmacyId,
+      name: list[0].pharmacyName,
+      address: list[0].pharmacyAddress || ''
+    };
+  });
+
   constructor() {
     this.loadCart();
 
@@ -32,7 +45,6 @@ export class CartService {
     effect(() => {
       if (typeof window !== 'undefined') {
         localStorage.setItem('cart', JSON.stringify(this.items()));
-        localStorage.setItem('cartPharmacy', JSON.stringify(this.selectedPharmacy()));
       }
     });
   }
@@ -40,8 +52,6 @@ export class CartService {
   private loadCart() {
     if (typeof window !== 'undefined') {
       const cachedItems = localStorage.getItem('cart');
-      const cachedPharm = localStorage.getItem('cartPharmacy');
-      
       if (cachedItems) {
         try {
           this.items.set(JSON.parse(cachedItems));
@@ -49,27 +59,16 @@ export class CartService {
           this.items.set([]);
         }
       }
-      
-      if (cachedPharm) {
-        try {
-          this.selectedPharmacy.set(JSON.parse(cachedPharm));
-        } catch {
-          this.selectedPharmacy.set(null);
-        }
-      }
     }
   }
 
   addToCart(medicine: any, price: number, pharmacy: any) {
-    // If pharmacy changes, clear existing cart items from previous pharmacy
-    if (this.selectedPharmacy() && this.selectedPharmacy()._id !== pharmacy._id) {
-      this.clearCart();
-    }
-    
-    this.selectedPharmacy.set(pharmacy);
-
     const currentItems = this.items();
-    const existingIndex = currentItems.findIndex(item => item.medicineId === medicine._id);
+    
+    // Find item matching both medicine ID and pharmacy ID
+    const existingIndex = currentItems.findIndex(item => 
+      item.medicineId === medicine._id && item.pharmacyId === pharmacy._id
+    );
 
     if (existingIndex > -1) {
       const updated = [...currentItems];
@@ -87,29 +86,30 @@ export class CartService {
           brand: medicine.brand,
           image: medicine.image,
           price,
-          quantity: 1
+          quantity: 1,
+          pharmacyId: pharmacy._id,
+          pharmacyName: pharmacy.name,
+          pharmacyAddress: pharmacy.address || ''
         }
       ]);
     }
   }
 
-  removeFromCart(medicineId: string) {
-    const updated = this.items().filter(item => item.medicineId !== medicineId);
+  removeFromCart(medicineId: string, pharmacyId: string) {
+    const updated = this.items().filter(item => 
+      !(item.medicineId === medicineId && item.pharmacyId === pharmacyId)
+    );
     this.items.set(updated);
-    
-    if (updated.length === 0) {
-      this.selectedPharmacy.set(null);
-    }
   }
 
-  updateQuantity(medicineId: string, quantity: number) {
+  updateQuantity(medicineId: string, pharmacyId: string, quantity: number) {
     if (quantity <= 0) {
-      this.removeFromCart(medicineId);
+      this.removeFromCart(medicineId, pharmacyId);
       return;
     }
 
     const updated = this.items().map(item => {
-      if (item.medicineId === medicineId) {
+      if (item.medicineId === medicineId && item.pharmacyId === pharmacyId) {
         return { ...item, quantity };
       }
       return item;
@@ -119,10 +119,8 @@ export class CartService {
 
   clearCart() {
     this.items.set([]);
-    this.selectedPharmacy.set(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('cart');
-      localStorage.removeItem('cartPharmacy');
     }
   }
 }

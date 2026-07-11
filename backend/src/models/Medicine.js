@@ -46,4 +46,4 @@ const MedicineSchema = new mongoose.Schema(
 // Add text index for searching name, brand, and activeIngredients
 MedicineSchema.index({ name: "text", brand: "text", activeIngredients: "text" });
 
-module.exports = mongoose.model("Medicine", MedicineSchema);
+module.exports = mongoose.model("Medicine", MedicineSchema, "medicines");

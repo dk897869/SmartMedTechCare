@@ -19,6 +19,18 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: String,
+      default: "",
+    },
+    profilePhoto: {
+      type: String,
+      default: "",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -66,4 +78,4 @@ UserSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", UserSchema, "users");

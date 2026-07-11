@@ -5,16 +5,14 @@ const User = require("../models/User");
 
 const seedDatabase = async () => {
   try {
-    // Check if pharmacies already exist
-    const pharmacyCount = await Pharmacy.countDocuments({});
-    if (pharmacyCount > 0) {
-      console.log("ℹ️ Database already seeded. Skipping initial seeding.");
-      return;
-    }
+    // Drop existing collections to ensure fresh seeds matching the UI image are loaded
+    await Pharmacy.deleteMany({});
+    await Medicine.deleteMany({});
+    await Inventory.deleteMany({});
+    
+    console.log("🌱 Dropped old collections. Starting image-aligned seeding...");
 
-    console.log("🌱 Database is empty. Starting database seeding...");
-
-    // Create Admin User
+    // Create Admin User if not exists
     const adminExists = await User.findOne({ email: "admin@smartmed.com" });
     if (!adminExists) {
       await User.create({
@@ -22,40 +20,55 @@ const seedDatabase = async () => {
         email: "admin@smartmed.com",
         password: "adminpassword123",
         role: "admin",
+        isVerified: true,
         defaultLocation: {
-          lat: 28.6139,
-          lng: 77.2090,
-          address: "SmartMedTechCare Command Center, CP, New Delhi"
+          lat: 30.7000,
+          lng: 76.6918,
+          address: "Sector 70, Mohali, Punjab 160071"
         }
       });
       console.log("👤 Default Admin account created: admin@smartmed.com / adminpassword123");
     }
 
-    // Create Pharmacies
+    // Create Pharmacies matching the image listings exactly
     const pharmacies = await Pharmacy.create([
       {
-        name: "Care & Cure Pharmacy",
-        address: "12 Block H, Connaught Place, New Delhi",
-        location: { lat: 28.6159, lng: 77.2070 },
+        name: "Apollo Pharmacy",
+        address: "Sector 70, Mohali, Punjab 160071",
+        location: { lat: 30.7020, lng: 76.6940 }, // ~0.4 km away
         contact: "+91 98765 43210",
         rating: 4.8,
       },
       {
-        name: "Apollo MedZone CP",
-        address: "45 Barakhamba Road, New Delhi",
-        location: { lat: 28.6259, lng: 77.2180 },
-        contact: "+91 99999 88888",
+        name: "MedPlus Pharmacy",
+        address: "Sector 71, Mohali, Punjab 160071",
+        location: { lat: 30.7090, lng: 76.6830 }, // ~1.2 km away
+        contact: "+91 95555 44444",
         rating: 4.6,
       },
       {
-        name: "Wellness Forever Pharmacy",
-        address: "8 Chanakyapuri, New Delhi",
-        location: { lat: 28.6059, lng: 77.1950 },
+        name: "Wellness Forever",
+        address: "Phase 8, Mohali, Punjab 160071",
+        location: { lat: 30.6860, lng: 76.7030 }, // ~2.1 km away
         contact: "+91 96666 55555",
+        rating: 4.5,
+      },
+      {
+        name: "Netmeds Pharmacy",
+        address: "Sector 66, Mohali, Punjab 160062",
+        location: { lat: 30.6800, lng: 76.6800 }, // ~2.8 km away
+        contact: "+91 94444 33333",
         rating: 4.4,
       },
+      {
+        name: "Care & Cure Pharmacy (CP)",
+        address: "12 Block H, Connaught Place, New Delhi",
+        location: { lat: 28.6159, lng: 77.2070 },
+        contact: "+91 98765 43210",
+        rating: 4.8,
+      }
     ]);
-    console.log(`🏥 Created ${pharmacies.length} pharmacies.`);
+    console.log(`🏥 Seeded ${pharmacies.length} pharmacies matching image.`);
 
     // Create Medicines
     const medicines = await Medicine.create([
@@ -112,44 +125,28 @@ const seedDatabase = async () => {
         sideEffects: ["Diarrhea", "Nausea", "Skin rash", "Yeast infection"],
         dosageGuidance: "500mg capsule every 8 hours or 875mg capsule every 12 hours. Complete the full course of treatment.",
         requiresPrescription: true,
-        image: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400",
+        image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400",
       },
     ]);
-    console.log(`💊 Created ${medicines.length} medicines.`);
+    console.log(`💊 Seeded ${medicines.length} medicines.`);
 
-    // Create Inventories with price and stock variation
+    // Seed inventories across pharmacies
     const inventories = [];
 
-    // Care & Cure Pharmacy prices (mostly moderate)
-    inventories.push(
-      { pharmacyId: pharmacies[0]._id, medicineId: medicines[0]._id, price: 12.5, stock: 120 },
-      { pharmacyId: pharmacies[0]._id, medicineId: medicines[1]._id, price: 45.0, stock: 80 },
-      { pharmacyId: pharmacies[0]._id, medicineId: medicines[2]._id, price: 18.0, stock: 150 },
-      { pharmacyId: pharmacies[0]._id, medicineId: medicines[3]._id, price: 9.9, stock: 200 },
-      { pharmacyId: pharmacies[0]._id, medicineId: medicines[4]._id, price: 95.0, stock: 40 }
-    );
-
-    // Apollo MedZone prices (slightly higher but premium stock)
-    inventories.push(
-      { pharmacyId: pharmacies[1]._id, medicineId: medicines[0]._id, price: 14.0, stock: 95 },
-      { pharmacyId: pharmacies[1]._id, medicineId: medicines[1]._id, price: 48.5, stock: 100 },
-      { pharmacyId: pharmacies[1]._id, medicineId: medicines[2]._id, price: 19.5, stock: 110 },
-      { pharmacyId: pharmacies[1]._id, medicineId: medicines[3]._id, price: 11.2, stock: 85 },
-      { pharmacyId: pharmacies[1]._id, medicineId: medicines[4]._id, price: 99.0, stock: 65 }
-    );
-
-    // Wellness Forever prices (cheaper, higher stock)
-    inventories.push(
-      { pharmacyId: pharmacies[2]._id, medicineId: medicines[0]._id, price: 11.8, stock: 250 },
-      { pharmacyId: pharmacies[2]._id, medicineId: medicines[1]._id, price: 42.0, stock: 180 },
-      { pharmacyId: pharmacies[2]._id, medicineId: medicines[2]._id, price: 16.5, stock: 300 },
-      { pharmacyId: pharmacies[2]._id, medicineId: medicines[3]._id, price: 8.5, stock: 400 },
-      { pharmacyId: pharmacies[2]._id, medicineId: medicines[4]._id, price: 92.5, stock: 20 }
-    );
+    // Loop through each pharmacy and insert stock for all medicines
+    for (let ph of pharmacies) {
+      inventories.push(
+        { pharmacyId: ph._id, medicineId: medicines[0]._id, price: 12.5, stock: 120 },
+        { pharmacyId: ph._id, medicineId: medicines[1]._id, price: 45.0, stock: 80 },
+        { pharmacyId: ph._id, medicineId: medicines[2]._id, price: 18.0, stock: 150 },
+        { pharmacyId: ph._id, medicineId: medicines[3]._id, price: 9.9, stock: 200 },
+        { pharmacyId: ph._id, medicineId: medicines[4]._id, price: 95.0, stock: 40 }
+      );
+    }
 
     await Inventory.insertMany(inventories);
-    console.log(`📦 Created ${inventories.length} inventory listings across pharmacies.`);
-    console.log("🌱 Database seeding completed successfully!");
+    console.log(`📦 Seeded ${inventories.length} inventories.`);
+    console.log("🌱 Image-aligned seeding completed successfully!");
   } catch (error) {
     console.error("❌ Seeding Database Error:", error.message);
   }

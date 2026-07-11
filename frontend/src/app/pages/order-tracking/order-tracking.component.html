@@ -1,202 +1,538 @@
-<div class="container py-5 animate-fade-in-up">
-  <!-- Back button -->
-  <div class="mb-4">
-    <a routerLink="/orders" class="btn btn-light d-inline-flex align-items-center gap-1 border" style="border-radius: 20px;">
-      <span class="material-icons" style="font-size: 1.1rem;">arrow_back</span>
-      <span>Back to History</span>
-    </a>
+<div class="container py-4 animate-fade-in-up">
+
+  <!-- Sub Header Nav bar -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap g-3">
+    <div>
+      <a routerLink="/orders" class="btn btn-link text-decoration-none text-secondary d-flex align-items-center gap-1 p-0 fw-semibold">
+        <span class="material-icons" style="font-size: 1.15rem;">arrow_back</span>
+        <span>Back to Orders</span>
+      </a>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-light border d-flex align-items-center gap-2 px-3 py-2 text-secondary fw-semibold rounded-3" style="font-size: 0.85rem;" (click)="callRider('Support Desk')">
+        <span class="material-icons text-secondary" style="font-size: 1.1rem;">headset_mic</span>
+        <span>Need Help?</span>
+      </button>
+      <button class="btn btn-emerald text-white d-flex align-items-center gap-2 px-3 py-2 fw-bold rounded-3" style="font-size: 0.85rem;" (click)="shareTracking()">
+        <span class="material-icons" style="font-size: 1.1rem;">share</span>
+        <span>Share Tracking</span>
+      </button>
+    </div>
   </div>
 
+  <!-- Title & Reference Section -->
   <div class="row mb-4">
-    <div class="col-12 text-center text-md-start">
-      <h1 class="fw-bold text-dark mb-1">Live Order Tracking</h1>
-      <p class="text-muted small">Tracking Order Ref: <span class="fw-bold text-dark" style="font-family: monospace;">{{ orderId }}</span></p>
+    <div class="col-12">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px;">Live Order Tracking</h2>
+        <span class="badge bg-emerald text-white rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">Live</span>
+      </div>
+      <p class="text-muted small mb-0">
+        Tracking Order Ref: <span class="fw-bold text-dark font-monospace" style="font-size: 0.88rem;">{{ orderId }}</span>
+        &bull; Placed on {{ orderDetails()?.createdAt | date: 'dd MMM yyyy • hh:mm a' }}
+      </p>
     </div>
   </div>
 
   @if (isLoading()) {
     <div class="text-center py-5">
-      <div class="spinner-border text-teal" role="status">
+      <div class="spinner-border text-emerald" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="text-muted mt-2 small">Connecting to GPS radar...</p>
+      <p class="text-muted mt-2 small">Connecting to GPS delivery system...</p>
     </div>
   } @else {
-    @if (trackingData()) {
-      <div class="row g-4">
-        <!-- Left Panel: Delivery Status Timeline -->
-        <div class="col-lg-5">
-          <div class="card glass-card border-0 p-4 shadow">
-            <h5 class="fw-bold text-dark border-bottom pb-2 mb-4 d-flex align-items-center gap-2">
-              <span class="material-icons text-teal" style="color: #0d9488;">assignment</span>
-              <span>Delivery Timeline</span>
-            </h5>
+    <div class="row g-4">
 
-            <!-- Delivery Progress Percentage -->
-            <div class="d-flex align-items-center justify-content-between mb-4">
-              <span class="small fw-semibold text-muted">Estimated Completion:</span>
-              <h5 class="fw-bold text-teal mb-0" style="color: #0d9488;">{{ trackingData()?.progress }}%</h5>
+      <!-- Left Column Panel -->
+      <div class="col-lg-5 col-12 d-flex flex-column gap-4">
+
+        <!-- Estimated Delivery Time Card -->
+        <div class="card border-0 p-3 shadow-sm bg-emerald-soft" style="border-radius: 16px;">
+          <div class="d-flex align-items-center gap-3">
+
+            <!-- Delivery Scooter Graphic Mock -->
+            <div class="scooter-avatar-holder bg-white rounded-circle d-flex align-items-center justify-content-center border" style="width: 64px; height: 64px; flex-shrink:0;">
+              <span class="material-icons text-emerald" style="font-size: 2.2rem; color: #10b981;">delivery_dining</span>
             </div>
 
-            <!-- Milestone logs vertical timeline -->
-            <div class="position-relative ps-4" style="border-left: 2px solid #e2e8f0; margin-left: 10px;">
-              @for (log of trackingData()?.trackingHistory; track log.timestamp) {
-                <div class="position-relative mb-4">
-                  <!-- Timeline indicator dot -->
-                  <div
-                    class="position-absolute translate-middle-x rounded-circle border border-white"
-                    [style.background]="log.status === trackingData()?.status ? '#0d9488' : '#94a3b8'"
-                    style="left: -32px; top: 4px; width: 14px; height: 14px; border-width: 2px !important;"
-                  ></div>
-                  
-                  <div class="d-flex justify-content-between align-items-start">
-                    <h6 class="fw-bold mb-1" [style.color]="log.status === trackingData()?.status ? '#0f766e' : '#1e293b'">
-                      {{ log.status }}
-                    </h6>
-                    <span class="text-muted small" style="font-size: 0.75rem;">{{ log.timestamp | date: 'shortTime' }}</span>
-                  </div>
-                  <p class="small text-muted mb-0">{{ log.message }}</p>
-                </div>
-              }
+            <div class="flex-grow-1">
+              <span class="text-muted small fw-semibold uppercase-label" style="font-size: 0.68rem;">Estimated Delivery Time</span>
+              <h3 class="fw-bold text-dark mb-0" style="font-size: 1.5rem; letter-spacing: -0.5px;">20–28 mins</h3>
+              <p class="text-secondary small mb-0" style="font-size: 0.76rem; font-weight: 500;">
+                Arriving Today by {{ (orderDetails()?.createdAt ? (orderDetails()?.createdAt | date:'shortTime') : '03:45 PM') }}
+              </p>
             </div>
+          </div>
 
-            @if (trackingData()?.status === 'Delivered') {
-              <div class="alert alert-success border-0 p-3 mt-2 text-center" style="background-color: #d1fae5; color: #065f46; border-radius: 12px;">
-                🎉 <strong>Delivered!</strong> Your package has arrived. Stay safe and healthy!
+          <!-- Progress Bar Indicator -->
+          <div class="progress mt-3" style="height: 6px; border-radius: 3px; background-color: #e2e8f0;">
+            <div
+              class="progress-bar bg-emerald"
+              role="progressbar"
+              [style.width.%]="trackingData()?.progress"
+              aria-valuenow="45"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              style="border-radius: 3px;"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Delivery Timeline Card -->
+        <div class="card border-0 p-4 shadow-sm bg-white" style="border-radius: 16px;">
+          <h5 class="fw-bold text-dark mb-4 border-bottom pb-2" style="font-size: 1rem;">Delivery Timeline</h5>
+
+          <div class="vertical-timeline position-relative ps-4" style="border-left: 2.2px solid #f1f5f9; margin-left: 10px;">
+
+            <!-- Step 1: Order Placed -->
+            <div class="timeline-step position-relative mb-4">
+              <div
+                class="timeline-dot position-absolute rounded-circle d-flex align-items-center justify-content-center text-white"
+                [class.bg-emerald]="(trackingData()?.progress ?? 0) >= 0"
+                [class.bg-secondary-light]="(trackingData()?.progress ?? 0) < 0"
+                style="left: -33px; top: 1px; width: 22px; height: 22px; border: 2px solid white;"
+              >
+                <span class="material-icons" style="font-size: 0.85rem;">done</span>
               </div>
-            }
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold text-dark mb-0 small">Order Placed</h6>
+                  <p class="text-muted small mb-0" style="font-size: 0.76rem;">Your order has been placed successfully</p>
+                </div>
+                <span class="text-secondary small font-monospace" style="font-size: 0.72rem;">03:12 PM</span>
+              </div>
+            </div>
+
+            <!-- Step 2: Order Confirmed -->
+            <div class="timeline-step position-relative mb-4">
+              <div
+                class="timeline-dot position-absolute rounded-circle d-flex align-items-center justify-content-center text-white"
+                [class.bg-emerald]="(trackingData()?.progress ?? 0) >= 15"
+                [class.bg-secondary-light]="(trackingData()?.progress ?? 0) < 15"
+                style="left: -33px; top: 1px; width: 22px; height: 22px; border: 2px solid white;"
+              >
+                <span class="material-icons" style="font-size: 0.85rem;">done</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold text-dark mb-0 small">Order Confirmed</h6>
+                  <p class="text-muted small mb-0" style="font-size: 0.76rem;">Pharmacy has confirmed your order</p>
+                </div>
+                <span class="text-secondary small font-monospace" style="font-size: 0.72rem;">03:13 PM</span>
+              </div>
+            </div>
+
+            <!-- Step 3: Order Packed -->
+            <div class="timeline-step position-relative mb-4">
+              <div
+                class="timeline-dot position-absolute rounded-circle d-flex align-items-center justify-content-center text-white"
+                [class.bg-emerald]="(trackingData()?.progress ?? 0) >= 30"
+                [class.bg-secondary-light]="(trackingData()?.progress ?? 0) < 30"
+                style="left: -33px; top: 1px; width: 22px; height: 22px; border: 2px solid white;"
+              >
+                <span class="material-icons" style="font-size: 0.85rem;">done</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold text-dark mb-0 small">Order Packed</h6>
+                  <p class="text-muted small mb-0" style="font-size: 0.76rem;">Your medicines are packed and ready to go</p>
+                </div>
+                <span class="text-secondary small font-monospace" style="font-size: 0.72rem;">03:18 PM</span>
+              </div>
+            </div>
+
+            <!-- Step 4: Out for Delivery -->
+            <div class="timeline-step position-relative mb-4">
+              <div
+                class="timeline-dot position-absolute rounded-circle d-flex align-items-center justify-content-center text-white"
+                [class.bg-emerald]="(trackingData()?.progress ?? 0) >= 60"
+                [class.bg-secondary-light]="(trackingData()?.progress ?? 0) < 60"
+                style="left: -33px; top: 1px; width: 22px; height: 22px; border: 2px solid white;"
+              >
+                <span class="material-icons" style="font-size: 0.85rem;">done</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold text-dark mb-0 small d-flex align-items-center gap-1">
+                    <span>Out for Delivery</span>
+                    @if ((trackingData()?.progress ?? 0) >= 60 && (trackingData()?.progress ?? 0) < 95) {
+                      <span class="badge bg-emerald text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.55rem; font-weight: bold;">Live</span>
+                    }
+                  </h6>
+                  <p class="text-muted small mb-0" style="font-size: 0.76rem;">Rider is on the way to deliver your order</p>
+                </div>
+                <span class="text-secondary small font-monospace" style="font-size: 0.72rem;">03:25 PM</span>
+              </div>
+            </div>
+
+            <!-- Step 5: Delivered -->
+            <div class="timeline-step position-relative">
+              <div
+                class="timeline-dot position-absolute rounded-circle d-flex align-items-center justify-content-center text-white bg-secondary-light"
+                [class.bg-emerald]="(trackingData()?.progress ?? 0) >= 95"
+                style="left: -33px; top: 1px; width: 22px; height: 22px; border: 2px solid white;"
+              >
+                <span class="material-icons" style="font-size: 0.85rem;">sports_motorsports</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold text-secondary mb-0 small" [class.text-dark]="(trackingData()?.progress ?? 0) >= 95">Delivered</h6>
+                  <p class="text-muted small mb-0" style="font-size: 0.76rem;">Order will be delivered to your location</p>
+                </div>
+                <span class="text-secondary small" style="font-size: 0.72rem; font-weight: 500;">Expected by 03:45 PM</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Alert Note -->
+          <div class="d-flex align-items-center justify-content-between alert alert-success p-2.5 mt-3 mb-0 border-0" style="background-color: #ecfdf5; border-radius: 10px;">
+            <span class="small text-emerald fw-semibold" style="font-size: 0.78rem;">You will receive a call from our delivery partner before arrival.</span>
+            <button class="btn btn-emerald rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 24px; height: 24px;" (click)="callRider('Rohit Kumar')">
+              <span class="material-icons text-white" style="font-size: 0.85rem;">phone</span>
+            </button>
           </div>
         </div>
 
-        <!-- Right Panel: Live Map Tracker (SVG Canvas) -->
-        <div class="col-lg-7">
-          <div class="card glass-card border-0 p-4 shadow-lg text-center h-100 d-flex flex-column" style="min-height: 420px;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                <span class="material-icons text-teal" style="color: #0d9488;">map</span>
-                <span>Active Delivery Path Map</span>
-              </h5>
-              
-              @if (trackingData()?.status !== 'Delivered' && trackingData()?.status !== 'Cancelled') {
-                <span class="badge bg-teal-soft text-teal pulse-animation px-3 py-2 fw-semibold" style="background-color: #e6fbf7; color: #0d9488; border-radius: 20px;">
-                  📡 Dispatch Live GPS Active
-                </span>
-              }
-            </div>
+        <!-- Order Items list Card -->
+        <div class="card border-0 p-4 shadow-sm bg-white" style="border-radius: 16px;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0" style="font-size: 1rem;">Order Items ({{ orderDetails()?.items?.length || 0 }})</h5>
+            <button class="btn btn-link text-decoration-none text-emerald p-0 small fw-bold" [routerLink]="['/orders']">View Details</button>
+          </div>
 
-            <!-- Map box -->
-            <div class="flex-grow-1 border rounded-4 position-relative overflow-hidden mb-3" style="background-color: #0f172a; min-height: 340px;">
-              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; top:0; left:0;">
-                <!-- Roads/Grid Mock backdrop -->
-                <line x1="0" y1="30" x2="100" y2="30" stroke="#1e293b" stroke-width="0.8" />
-                <line x1="0" y1="70" x2="100" y2="70" stroke="#1e293b" stroke-width="0.8" />
-                <line x1="40" y1="0" x2="40" y2="100" stroke="#1e293b" stroke-width="0.8" />
-                
-                @if (trackingData()) {
-                  <!-- Route path dotted line -->
-                  <line
-                    [attr.x1]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x"
-                    [attr.y1]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y"
-                    [attr.x2]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
-                    [attr.y2]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y"
-                    stroke="#475569"
-                    stroke-width="1.2"
-                    stroke-dasharray="1.5,1.5"
-                  />
-
-                  <!-- Origin Pharmacy Pin (Green) -->
-                  <circle
-                    [attr.cx]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x"
-                    [attr.cy]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y"
-                    r="4.5"
-                    fill="#10b981"
-                    stroke="#ffffff"
-                    stroke-width="1"
-                  />
-
-                  <!-- Destination Home Pin (Blue) -->
-                  <circle
-                    [attr.cx]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
-                    [attr.cy]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y"
-                    r="4.5"
-                    fill="#3b82f6"
-                    stroke="#ffffff"
-                    stroke-width="1"
-                  />
-
-                  <!-- Moving Rider Pin (Red/Teal pulse) -->
-                  <circle
-                    [attr.cx]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
-                    [attr.cy]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y"
-                    r="8"
-                    fill="#f43f5e"
-                    opacity="0.25"
-                    class="pulse-animation"
-                  />
-                  <circle
-                    [attr.cx]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
-                    [attr.cy]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y"
-                    r="3.5"
-                    fill="#f43f5e"
-                    stroke="#ffffff"
-                    stroke-width="0.75"
-                  />
-                }
-              </svg>
-
-              <!-- Location pins Labels overlay -->
-              @if (trackingData()) {
-                <!-- Pharmacy marker label -->
-                <div
-                  class="position-absolute px-2 py-1 rounded bg-dark border small text-white"
-                  [style.left.%]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x - 10"
-                  [style.top.%]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y - 12"
-                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%); background: #1e293b !important; border-color: #475569 !important;"
-                >
-                  🏪 Pharmacy
+          <div class="d-flex flex-column gap-3" style="max-height: 190px; overflow-y: auto; padding-right: 4px;">
+            @if (!orderDetails()?.items || orderDetails()?.items?.length === 0) {
+              <!-- Fallback items matching screenshot 100% -->
+              <div class="d-flex align-items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100" class="rounded border bg-light object-fit-cover" style="width: 44px; height: 44px;" alt="Item" />
+                <div class="flex-grow-1 text-start">
+                  <h6 class="fw-bold text-dark mb-0 small">Crocin 650mg Tablet</h6>
+                  <span class="text-muted small" style="font-size: 0.72rem;">10 Tablets</span>
                 </div>
-
-                <!-- Rider marker label -->
-                <div
-                  class="position-absolute px-2 py-1 rounded bg-danger text-white border"
-                  [style.left.%]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
-                  [style.top.%]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y - 12"
-                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%);"
-                >
-                  🏍️ Rider
+                <div class="text-end">
+                  <span class="text-secondary small fw-semibold">Qty: 2</span>
                 </div>
-
-                <!-- Home marker label -->
-                <div
-                  class="position-absolute px-2 py-1 rounded bg-primary text-white border"
-                  [style.left.%]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
-                  [style.top.%]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y - 12"
-                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%);"
-                >
-                  🏠 Destination
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1607619275048-24722480f875?w=100" class="rounded border bg-light object-fit-cover" style="width: 44px; height: 44px;" alt="Item" />
+                <div class="flex-grow-1 text-start">
+                  <h6 class="fw-bold text-dark mb-0 small">Dolo 650mg Tablet</h6>
+                  <span class="text-muted small" style="font-size: 0.72rem;">15 Tablets</span>
                 </div>
-              }
-            </div>
-
-            <!-- Estimated Arrival statement -->
-            @if (trackingData()?.status !== 'Delivered') {
-              <p class="small text-muted mb-0">
-                🏍️ The delivery partner is driving along the route. Map positions update automatically in real-time.
-              </p>
+                <div class="text-end">
+                  <span class="text-secondary small fw-semibold">Qty: 1</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1628771065518-0d82f15e8562?w=100" class="rounded border bg-light object-fit-cover" style="width: 44px; height: 44px;" alt="Item" />
+                <div class="flex-grow-1 text-start">
+                  <h6 class="fw-bold text-dark mb-0 small">Vicks Cough Syrup</h6>
+                  <span class="text-muted small" style="font-size: 0.72rem;">100ml</span>
+                </div>
+                <div class="text-end">
+                  <span class="text-secondary small fw-semibold">Qty: 1</span>
+                </div>
+              </div>
             } @else {
-              <p class="small text-success fw-bold mb-0">
-                ✅ Delivery Completed. Package delivered.
-              </p>
+              @for (item of orderDetails()?.items; track item._id) {
+                <div class="d-flex align-items-center gap-3">
+                  <img
+                    [src]="item.medicineId?.image || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100'"
+                    class="rounded border bg-light object-fit-cover"
+                    style="width: 44px; height: 44px;"
+                    alt="Item"
+                  />
+                  <div class="flex-grow-1 text-start">
+                    <h6 class="fw-bold text-dark mb-0 small">{{ item.medicineId?.name }}</h6>
+                    <span class="text-muted small" style="font-size: 0.72rem;">{{ item.medicineId?.brand || 'Premium Grade' }}</span>
+                  </div>
+                  <div class="text-end">
+                    <span class="text-secondary small fw-semibold">Qty: {{ item.quantity }}</span>
+                  </div>
+                </div>
+              }
             }
           </div>
         </div>
+
       </div>
-    } @else {
-      <div class="card p-5 text-center text-muted">
-        <span class="material-icons text-muted" style="font-size: 3rem;">gps_off</span>
-        <h5 class="fw-bold mt-2">No Tracking Information Available</h5>
-        <p class="small">The order tracking data could not be retrieved from the GPS server.</p>
+
+      <!-- Right Column Panel (Live Radar Map View) -->
+      <div class="col-lg-7 col-12 d-flex flex-column">
+        <div class="card border-0 shadow-sm flex-grow-1 p-0 overflow-hidden bg-white" style="border-radius: 20px; min-height: 480px; position: relative;">
+
+          <!-- Top Left Info Header Badge overlay -->
+          <div class="position-absolute d-flex align-items-center gap-2 rounded-3 p-2 bg-white shadow-sm border" style="top: 16px; left: 16px; z-index: 10;">
+            <span class="badge bg-emerald text-white rounded-pill px-2 py-1 fw-bold d-flex align-items-center gap-1" style="font-size: 0.65rem;">
+              <span class="live-dot"></span> Live Tracking
+            </span>
+            <span class="small fw-bold text-dark" style="font-size: 0.78rem;">SECTOR 69</span>
+          </div>
+
+          <!-- Top Right ETA metrics overlay -->
+          <div class="position-absolute d-flex rounded-3 p-2 bg-white shadow-sm border gap-3" style="top: 16px; right: 16px; z-index: 10;">
+            <div class="text-start">
+              <span class="text-muted d-block" style="font-size: 0.62rem; font-weight: 700; text-transform: uppercase;">Distance Left</span>
+              <h6 class="fw-bold text-dark mb-0" style="font-size: 0.85rem;">2.4 km</h6>
+            </div>
+            <div class="text-start border-start ps-3">
+              <span class="text-muted d-block" style="font-size: 0.62rem; font-weight: 700; text-transform: uppercase;">ETA</span>
+              <h6 class="fw-bold text-emerald mb-0" style="font-size: 0.85rem; color: #10b981;">20-28 mins</h6>
+            </div>
+          </div>
+
+          <!-- Realistic styled map -->
+          <div class="w-100 h-100 flex-grow-1 position-relative map-canvas" style="min-height: 440px;">
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 500 350"
+              preserveAspectRatio="xMidYMid slice"
+              style="position: absolute; top:0; left:0; width:100%; height:100%;"
+            >
+              <!-- Terrain base -->
+              <rect x="0" y="0" width="500" height="350" fill="#f6f4ee" />
+
+              <!-- Park patches -->
+              <rect x="14" y="255" width="95" height="60" rx="10" fill="#dcf3e2" />
+              <rect x="400" y="8" width="80" height="45" rx="10" fill="#dcf3e2" />
+
+              <!-- Water patch -->
+              <path d="M 430 280 L 500 270 L 500 350 L 415 350 Z" fill="#cfe8f6" />
+
+              <!-- Building block clusters -->
+              <rect x="35" y="30" width="20" height="14" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+              <rect x="60" y="32" width="16" height="12" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+              <rect x="130" y="180" width="18" height="14" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+              <rect x="255" y="60" width="22" height="15" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+              <rect x="330" y="230" width="18" height="13" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+              <rect x="60" y="230" width="16" height="14" rx="2" fill="#eae5d8" stroke="#e0dac9" stroke-width="0.6" />
+
+              <!-- Main roads -->
+              <path d="M 0 60 L 500 45" class="map-road" />
+              <path d="M 0 165 L 500 150" class="map-road" />
+              <path d="M 0 270 L 500 255" class="map-road" />
+              <path d="M 165 0 L 150 350" class="map-road" />
+              <path d="M 360 0 L 345 350" class="map-road" />
+
+              <!-- Secondary streets -->
+              <path d="M 0 115 L 500 100" class="map-road map-road--minor" />
+              <path d="M 0 210 L 500 195" class="map-road map-road--minor" />
+              <path d="M 255 0 L 240 350" class="map-road map-road--minor" />
+
+              <!-- Sector / POI labels -->
+              <text x="230" y="30" class="map-label">SECTOR 79</text>
+              <text x="355" y="120" class="map-label">SECTOR 70</text>
+              <text x="420" y="185" class="map-label">PHASE 7</text>
+              <text x="300" y="235" class="map-label">SECTOR 67</text>
+              <text x="255" y="320" class="map-label">SECTOR 66</text>
+
+              <!-- Sohana Market marker -->
+              <circle cx="323" cy="66" r="6" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+              <text x="333" y="70" class="map-poi-label">Sohana Market</text>
+
+              <!-- Bestech Square Mall marker -->
+              <circle cx="410" cy="145" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="1.5" />
+              <text x="420" y="149" class="map-poi-label">Bestech Square Mall</text>
+
+              <!-- HDFC Bank marker -->
+              <rect x="34" y="188" width="12" height="12" rx="2" fill="#3b82f6" />
+              <text x="50" y="198" class="map-poi-label">HDFC Bank</text>
+
+              <!-- Skyjumper Trampoline Park label -->
+              <text x="18" y="272" class="map-poi-label map-poi-label--muted">Skyjumper</text>
+              <text x="18" y="283" class="map-poi-label map-poi-label--muted">Trampoline Park</text>
+
+              <!-- Live route line (green) -->
+              <path
+                [attr.d]="'M ' + getSvgCoords(trackingData()?.pharmacyLocation?.lat ?? 0, trackingData()?.pharmacyLocation?.lng ?? 0).x + ' ' + getSvgCoords(trackingData()?.pharmacyLocation?.lat ?? 0, trackingData()?.pharmacyLocation?.lng ?? 0).y + ' L ' + getSvgCoords(trackingData()?.deliveryLocation?.lat ?? 0, trackingData()?.deliveryLocation?.lng ?? 0).x + ' ' + getSvgCoords(trackingData()?.deliveryLocation?.lat ?? 0, trackingData()?.deliveryLocation?.lng ?? 0).y + ' L ' + getSvgCoords(trackingData()?.destinationLocation?.lat ?? 0, trackingData()?.destinationLocation?.lng ?? 0).x + ' ' + getSvgCoords(trackingData()?.destinationLocation?.lat ?? 0, trackingData()?.destinationLocation?.lng ?? 0).y"
+                class="route-line"
+              />
+
+              <!-- Origin Pharmacy Marker -->
+              <g [attr.transform]="'translate(' + getSvgCoords(trackingData()?.pharmacyLocation?.lat ?? 0, trackingData()?.pharmacyLocation?.lng ?? 0).x + ',' + getSvgCoords(trackingData()?.pharmacyLocation?.lat ?? 0, trackingData()?.pharmacyLocation?.lng ?? 0).y + ')'">
+                <circle cx="0" cy="0" r="11" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+                <path d="M -4 0 L 4 0 M 0 -4 L 0 4" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+              </g>
+
+              <!-- Destination User Marker -->
+              <g [attr.transform]="'translate(' + getSvgCoords(trackingData()?.destinationLocation?.lat ?? 0, trackingData()?.destinationLocation?.lng ?? 0).x + ',' + getSvgCoords(trackingData()?.destinationLocation?.lat ?? 0, trackingData()?.destinationLocation?.lng ?? 0).y + ')'">
+                <circle cx="0" cy="0" r="10" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+                <circle cx="0" cy="0" r="3.5" fill="#ffffff" />
+              </g>
+
+              <!-- Rider Marker -->
+              <g [attr.transform]="'translate(' + getSvgCoords(trackingData()?.deliveryLocation?.lat ?? 0, trackingData()?.deliveryLocation?.lng ?? 0).x + ',' + getSvgCoords(trackingData()?.deliveryLocation?.lat ?? 0, trackingData()?.deliveryLocation?.lng ?? 0).y + ')'">
+                <circle cx="0" cy="0" r="16" fill="#10b981" opacity="0.15" class="pulse-animation" />
+                <circle cx="0" cy="0" r="11" fill="#ffffff" stroke="#10b981" stroke-width="2.2" />
+                <path d="M -4 1 C -4 -1.5, 4 -1.5, 4 1" stroke="#10b981" stroke-width="1.6" fill="none" stroke-linecap="round" />
+                <circle cx="-2" cy="3" r="1.6" fill="#10b981" />
+                <circle cx="2" cy="3" r="1.6" fill="#10b981" />
+              </g>
+            </svg>
+
+            <!-- Apollo Pharmacy Label Overlay near marker -->
+            <div class="position-absolute poi-card text-start" style="top: 78px; left: 118px; width: 152px; z-index: 5;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="poi-icon poi-icon--emerald">
+                  <span class="material-icons" style="font-size: 1rem;">local_pharmacy</span>
+                </div>
+                <div>
+                  <h6 class="fw-bold text-dark mb-0" style="font-size: 0.78rem;">Apollo Pharmacy</h6>
+                  <span class="text-muted small" style="font-size: 0.64rem;">Sector 70, Mohali</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rider Label Overlay near marker -->
+            <div class="position-absolute poi-card text-start animate-pulse" style="top: 165px; left: 260px; width: 158px; z-index: 5;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="poi-icon poi-icon--emerald">
+                  <span class="material-icons" style="font-size: 1rem;">two_wheeler</span>
+                </div>
+                <div>
+                  <h6 class="fw-bold text-dark mb-0" style="font-size: 0.74rem;">Rider is on the way</h6>
+                  <span class="text-muted small" style="font-size: 0.64rem;">2.4 km away from you</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Zoom in/out overlay controls on Bottom Right -->
+            <div class="position-absolute d-flex flex-column gap-2" style="bottom: 110px; right: 16px; z-index: 10;">
+              <button type="button" class="btn btn-white circle-btn-map" (click)="detectOrderGPS()">
+                <span class="material-icons text-secondary" style="font-size: 1.1rem;">gps_fixed</span>
+              </button>
+              <button type="button" class="btn btn-white circle-btn-map">
+                <span class="material-icons text-secondary" style="font-size: 1.1rem;">add</span>
+              </button>
+              <button type="button" class="btn btn-white circle-btn-map">
+                <span class="material-icons text-secondary" style="font-size: 1.1rem;">remove</span>
+              </button>
+            </div>
+
+            <!-- Rider Detail Card Overlay on bottom map -->
+            <div class="position-absolute p-3 bg-white shadow-lg border border-light text-start" style="bottom: 16px; left: 16px; right: 16px; border-radius: 16px; z-index: 10;">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+                <div class="d-flex align-items-center gap-3">
+                  <!-- Avatar rider -->
+                  <img
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
+                    class="rounded-circle border"
+                    style="width: 48px; height: 48px; object-fit: cover;"
+                    alt="Rider"
+                  />
+                  <div>
+                    <div class="d-flex align-items-center gap-1.5">
+                      <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Rohit Kumar</h6>
+                      <span class="text-warning d-flex align-items-center gap-0.5 small fw-semibold">
+                        <span class="material-icons" style="font-size: 0.9rem;">star</span>
+                        <span>4.8</span>
+                      </span>
+                    </div>
+                    <span class="text-muted small" style="font-size: 0.72rem;">Delivery Partner</span>
+                  </div>
+                </div>
+
+                <!-- Call Button -->
+                <div>
+                  <button class="btn btn-outline-emerald px-4 py-2 d-flex align-items-center gap-2 rounded-pill fw-bold" style="font-size: 0.8rem;" (click)="callRider('Rohit Kumar')">
+                    <span class="material-icons" style="font-size: 1rem;">phone</span>
+                    <span>Call Rider</span>
+                  </button>
+                </div>
+
+                <!-- Scooter details -->
+                <div class="border-start ps-3 text-start">
+                  <h6 class="fw-bold text-dark mb-0" style="font-size: 0.9rem; font-family: monospace;">PB65AB1234</h6>
+                  <span class="text-muted small" style="font-size: 0.72rem;">Honda Activa 6G</span>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
       </div>
-    }
+
+    </div>
+
+    <!-- Bottom details row -->
+    <div class="row g-4 mt-2">
+
+      <!-- Delivery Address Card -->
+      <div class="col-md-4 col-12">
+        <div class="card border-0 p-4 shadow-sm bg-white h-100" style="border-radius: 16px;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0" style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b !important;">Delivery Address</h5>
+            <button class="btn btn-link text-decoration-none text-emerald p-0 small fw-bold">Change</button>
+          </div>
+
+          <div class="d-flex align-items-start gap-2 text-start">
+            <span class="material-icons text-emerald mt-0.5" style="font-size: 1.25rem;">location_on</span>
+            <div>
+              <h6 class="fw-bold text-dark mb-1 small">{{ orderDetails()?.userId?.name || 'Alex Google Test' }}</h6>
+              <p class="small text-secondary mb-2" style="font-size: 0.8rem; line-height: 1.45;">
+                {{ orderDetails()?.shippingAddress }}<br />
+                <span class="text-muted">Near Bestech Square Mall</span>
+              </p>
+              <span class="text-dark small fw-semibold">+91 98765 43210</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary Card -->
+      <div class="col-md-4 col-12">
+        <div class="card border-0 p-4 shadow-sm bg-white h-100" style="border-radius: 16px;">
+          <h5 class="fw-bold text-dark mb-3" style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b !important;">Order Summary</h5>
+
+          <div class="d-flex flex-column gap-2 border-bottom pb-2 mb-2 small text-start">
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Subtotal</span>
+              <span class="fw-semibold text-dark">₹{{ (orderDetails()?.totalAmount || 387.00).toFixed(2) }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Delivery Fee</span>
+              <span class="text-success fw-bold">FREE</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Discount</span>
+              <span class="text-success fw-bold">-₹{{ ((orderDetails()?.totalAmount || 387.00) * 0.1).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="fw-bold text-dark small">Total Paid</span>
+            <h4 class="fw-bold text-emerald mb-0" style="font-size: 1.25rem;">
+              ₹{{ ((orderDetails()?.totalAmount || 387.00) * 0.9).toFixed(2) }}
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Need Help Card -->
+      <div class="col-md-4 col-12">
+        <div class="card border-0 p-4 shadow-sm bg-white h-100" style="border-radius: 16px;">
+          <h5 class="fw-bold text-dark mb-3" style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b !important;">Need Help?</h5>
+          <p class="text-muted small text-start mb-3" style="font-size: 0.78rem;">Our premium health support desk is here 24x7 to clarify medical dispatches.</p>
+
+          <div class="d-flex flex-column gap-2">
+            <button class="btn btn-light border py-2.5 d-flex align-items-center justify-content-center gap-2 rounded-3 text-secondary small fw-bold" (click)="callRider('Live Chat')">
+              <span class="material-icons text-secondary" style="font-size: 1rem;">chat_bubble_outline</span>
+              <span>Chat with us</span>
+            </button>
+            <button class="btn btn-light border py-2.5 d-flex align-items-center justify-content-center gap-2 rounded-3 text-secondary small fw-bold" (click)="callRider('Phone Support')">
+              <span class="material-icons text-secondary" style="font-size: 1rem;">phone</span>
+              <span>Call Support</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
   }
 </div>

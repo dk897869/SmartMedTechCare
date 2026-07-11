@@ -1,30 +1,307 @@
-/* Nearby pharmacies specific style rules */
-.select-hover-card:hover {
-  border-color: #0d9488 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+/* Emerald Theme design overrides */
+$emerald: #10b981;
+$emerald-hover: #059669;
+$emerald-soft: rgba(16, 185, 129, 0.07);
+$verified-soft: rgba(16, 185, 129, 0.08);
+
+.text-emerald {
+  color: $emerald !important;
 }
-.bg-teal-soft {
-  background-color: rgba(20, 184, 166, 0.1);
-  color: #14b8a6;
+
+.bg-emerald-soft {
+  background-color: $emerald-soft !important;
+  color: $emerald !important;
 }
-.bg-info {
-  background-color: #0ea5e9 !important;
+
+.bg-verified-badge {
+  background-color: $verified-soft !important;
+  color: $emerald !important;
 }
-.border-teal {
-  border-color: #14b8a6 !important;
-}
-.pulse-animation {
-  animation: pulse-ring 1.8s infinite ease-in-out;
-  transform-origin: center;
-}
-@keyframes pulse-ring {
-  0% {
-    r: 4px;
-    opacity: 0.8;
+
+/* Header Search Group */
+.search-container-group {
+  border-radius: 30px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  
+  .input-group-text {
+    border: none;
+    background: #ffffff;
   }
-  100% {
-    r: 14px;
-    opacity: 0;
+  
+  .form-control {
+    border: none;
+    font-size: 0.9rem;
+    padding: 10px 4px;
+    box-shadow: none;
+    font-family: 'Outfit', sans-serif;
+    
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+  
+  .btn-emerald {
+    background-color: $emerald;
+    border: none;
+    border-radius: 0 30px 30px 0;
+    transition: all 0.2s;
+    
+    &:hover {
+      background-color: $emerald-hover;
+    }
+  }
+}
+
+/* Current location switch */
+.custom-green-switch {
+  cursor: pointer;
+  width: 2.4em !important;
+  height: 1.25em !important;
+  
+  &:checked {
+    background-color: $emerald !important;
+    border-color: $emerald !important;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15) !important;
+  }
+}
+
+/* Regional Dropdown wrappers */
+.filter-select-wrapper {
+  background: #ffffff;
+  height: 60px;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+  
+  &:hover {
+    border-color: #cbd5e1;
+  }
+  
+  .select-label {
+    display: block;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: -1px;
+    margin-top: 1px;
+  }
+  
+  select {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    background-position: right 0px center;
+    background-size: 10px;
+    padding-right: 15px;
+  }
+}
+
+.btn-outline-filters {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  height: 60px;
+  
+  &:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+  }
+}
+
+/* Pharmacy cards listings */
+.pharmacy-card-item {
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 16px !important;
+  background: #ffffff;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
+    border-color: #e2e8f0 !important;
+    
+    .card-title-hover {
+      color: $emerald !important;
+    }
+  }
+}
+
+.active-pharmacy-card {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  background-color: rgba(16, 185, 129, 0.02) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.04) !important;
+}
+
+.pharmacy-avatar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.border-circle-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+  }
+}
+
+.btn-outline-stock {
+  border: 1.5px solid #10b981;
+  color: #10b981;
+  background: transparent;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #10b981;
+    color: #ffffff;
+  }
+}
+
+/* Map views overlay and grid styles */
+.btn-map-active {
+  background-color: $emerald !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
+}
+
+.map-draw-canvas {
+  background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+  background-size: 20px 20px;
+}
+
+.satellite-background-grid {
+  background-color: #0f172a !important;
+  background-image: radial-gradient(#334155 1.5px, transparent 1.5px) !important;
+  
+  svg {
+    path {
+      stroke: #1e293b !important;
+    }
+  }
+}
+
+.map-card-detail {
+  width: 280px;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+.circle-btn-map {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #f8fafc;
+    transform: scale(1.05);
+  }
+}
+
+.btn-emerald {
+  background-color: $emerald;
+  color: #ffffff;
+  border-radius: 12px;
+  border: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: $emerald-hover;
+  }
+}
+
+/* Range sliders */
+.custom-green-range {
+  &::-webkit-slider-thumb {
+    background: $emerald !important;
+    &:active {
+      background: $emerald-hover !important;
+    }
+  }
+  &::-moz-range-thumb {
+    background: $emerald !important;
+  }
+  &::-ms-thumb {
+    background: $emerald !important;
+  }
+}
+
+/* Quick Filter Badges */
+.btn-quick-filter {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.78rem;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+  }
+}
+
+.btn-quick-filter-active {
+  background-color: $emerald-soft !important;
+  color: $emerald !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Bottom stats cards labeling */
+.uppercase-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+/* Custom scrollbars inside store listing */
+.pharmacies-list-scrollable {
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    &:hover {
+      background: #94a3b8;
+    }
   }
 }

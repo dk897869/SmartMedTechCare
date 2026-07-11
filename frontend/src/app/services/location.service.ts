@@ -9,6 +9,35 @@ export class LocationService {
   
   readonly currentCoords = signal<{ lat: number; lng: number; address: string }>(this.defaultCoords);
 
+  readonly statesAndCities = [
+    {
+      state: 'Delhi',
+      cities: [
+        { name: 'New Delhi (Connaught Place)', lat: 28.6139, lng: 77.2090 }
+      ]
+    },
+    {
+      state: 'Punjab',
+      cities: [
+        { name: 'Mohali', lat: 30.7000, lng: 76.6918 },
+        { name: 'Ludhiana', lat: 30.9010, lng: 75.8573 }
+      ]
+    },
+    {
+      state: 'Chandigarh',
+      cities: [
+        { name: 'Chandigarh Sector 35', lat: 30.7300, lng: 76.7700 }
+      ]
+    },
+    {
+      state: 'Maharashtra',
+      cities: [
+        { name: 'Mumbai', lat: 19.0760, lng: 72.8777 },
+        { name: 'Pune', lat: 18.5204, lng: 73.8567 }
+      ]
+    }
+  ];
+
   constructor() {
     this.detectLocation();
   }
@@ -43,5 +72,15 @@ export class LocationService {
 
   updateManualLocation(lat: number, lng: number, address: string) {
     this.currentCoords.set({ lat, lng, address });
+  }
+
+  selectCity(cityName: string) {
+    for (const stateObj of this.statesAndCities) {
+      const city = stateObj.cities.find(c => c.name === cityName);
+      if (city) {
+        this.updateManualLocation(city.lat, city.lng, `${city.name}, ${stateObj.state}`);
+        break;
+      }
+    }
   }
 }

@@ -1,28 +1,190 @@
-/* Order tracking specific style rules */
-.bg-teal-soft {
-  background-color: rgba(20, 184, 166, 0.1);
-  color: #14b8a6;
+/* Order Tracking Styling Overrides */
+$emerald: #10b981;
+$emerald-hover: #059669;
+$emerald-soft: rgba(16, 185, 129, 0.08);
+
+.text-emerald {
+  color: $emerald !important;
 }
+
+.bg-emerald {
+  background-color: $emerald !important;
+}
+
+.bg-emerald-soft {
+  background-color: $emerald-soft !important;
+  color: $emerald !important;
+}
+
+.bg-secondary-light {
+  background-color: #cbd5e1 !important;
+}
+
+.btn-emerald {
+  background-color: $emerald;
+  color: #ffffff;
+  border: none;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: $emerald-hover;
+    color: #ffffff;
+  }
+}
+
+.btn-outline-emerald {
+  border: 1.5px solid $emerald;
+  color: $emerald;
+  background: transparent;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: $emerald;
+    color: #ffffff;
+  }
+}
+
+/* Timeline Custom alignment */
+.vertical-timeline {
+  .timeline-step {
+    .timeline-dot {
+      z-index: 2;
+    }
+  }
+}
+
+/* Scooter Avatar container */
+.scooter-avatar-holder {
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.05);
+}
+
+/* Map overlay circle buttons */
+.circle-btn-map {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #f8fafc;
+    transform: scale(1.05);
+  }
+}
+
+/* ---------------------------------- */
+/* Map canvas + terrain styling       */
+/* ---------------------------------- */
+.map-canvas {
+  background-color: #f6f4ee;
+}
+
+.map-road {
+  stroke: #ffffff;
+  stroke-width: 11;
+  fill: none;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.03));
+
+  &--minor {
+    stroke-width: 6;
+    stroke: #fbfaf6;
+  }
+}
+
+.map-label {
+  fill: #b9c4cf;
+  font-size: 8.5px;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.4px;
+}
+
+.map-poi-label {
+  fill: #94a3b8;
+  font-size: 7.5px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+
+  &--muted {
+    fill: #b8c2cc;
+  }
+}
+
+.route-line {
+  stroke: $emerald;
+  stroke-width: 3.5;
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Live tracking pulsing dot */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: inline-block;
+  animation: live-blink 1.4s infinite ease-in-out;
+}
+
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* POI overlay cards (Pharmacy / Rider labels on map) */
+.poi-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.poi-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &--emerald {
+    background-color: $emerald-soft;
+    color: $emerald;
+  }
+}
+
+/* Pulsing markers animations */
 .pulse-animation {
-  animation: pulse-marker 1.6s infinite ease-in-out;
+  animation: pulse-marker 1.8s infinite ease-in-out;
   transform-origin: center;
 }
+
 @keyframes pulse-marker {
   0% {
-    r: 4px;
+    r: 11px;
     opacity: 0.8;
   }
   100% {
-    r: 12px;
+    r: 24px;
     opacity: 0;
   }
 }
+
+/* Uppercase headings */
 .uppercase-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.8px;
+  font-weight: 700;
   text-transform: uppercase;
-  display: block;
-}
-.border-bottom {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
 }

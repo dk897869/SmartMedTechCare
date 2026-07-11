@@ -38,4 +38,4 @@ const PharmacySchema = new mongoose.Schema(
 );
 
 // GeoJSON index or standard spatial indexes can be simulated, but we'll do proximity search in code via Haversine formula for maximum cross-platform compatibility
-module.exports = mongoose.model("Pharmacy", PharmacySchema);
+module.exports = mongoose.model("Pharmacy", PharmacySchema, "pharmacies");

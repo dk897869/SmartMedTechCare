@@ -1,39 +1,109 @@
 <div class="container py-5 animate-fade-in-up">
-  <div class="row mb-4">
-    <div class="col-12 text-center text-md-start">
-      <h1 class="fw-bold text-dark mb-1">My Health Profile</h1>
-      <p class="text-muted">Maintain your personal metrics and configure medication intake reminders.</p>
-    </div>
-  </div>
-
   <div class="row g-4">
-    <!-- Left Column: Patient Bio & Metrics Form -->
-    <div class="col-lg-6">
-      <div class="card glass-card border-0 p-4 shadow h-100">
-        <h5 class="fw-bold text-dark mb-4 border-bottom pb-2 d-flex align-items-center gap-2">
-          <span class="material-icons text-teal" style="color: #0d9488;">manage_accounts</span>
-          <span>Health Profile Settings</span>
+    <!-- Left Section: Avatar Management & Deletion -->
+    <div class="col-lg-4">
+      <div class="card glass-card border-0 p-4 text-center shadow mb-4">
+        <h5 class="fw-bold text-dark mb-4">Profile Photo</h5>
+        
+        <!-- Avatar Circular frame -->
+        <div class="mb-4 d-flex justify-content-center">
+          <div class="position-relative" style="width: 140px; height: 140px;">
+            @if (profilePhoto) {
+              <img [src]="profilePhoto" alt="Profile Picture" class="rounded-circle border shadow-sm" 
+                   style="width: 140px; height: 140px; object-fit: cover; border: 4px solid #10b981 !important;" />
+            } @else {
+              <div class="rounded-circle border d-flex align-items-center justify-content-center text-secondary bg-light"
+                   style="width: 140px; height: 140px; border: 4px solid #e2e8f0 !important;">
+                <span class="material-icons" style="font-size: 5rem;">account_circle</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- File Upload Selector -->
+        <div class="mb-4">
+          <label class="btn btn-outline-teal btn-sm px-3 w-100 py-2 d-flex align-items-center justify-content-center gap-1">
+            <span class="material-icons" style="font-size: 1.1rem;">photo_camera</span>
+            <span>Upload Photo</span>
+            <input type="file" (change)="onFileChange($event)" accept="image/*" class="d-none" />
+          </label>
+          <div class="text-muted small mt-2" style="font-size: 0.72rem;">
+            📸 Automatic compression to 10-50 KB range
+          </div>
+        </div>
+
+        <hr class="border-secondary-subtle my-3" />
+
+        <!-- Delete Profile Section -->
+        <div class="py-2">
+          <p class="small text-muted mb-3">Want to remove your account from our records?</p>
+          <button class="btn btn-outline-danger w-100 py-2 d-flex align-items-center justify-content-center gap-2" 
+                  style="border-radius: 12px; font-weight: 600;" (click)="deleteAccount()">
+            <span class="material-icons" style="font-size: 1.1rem;">delete_forever</span>
+            <span>Delete Account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Section: Credentials, Health Details & Alarm Reminders -->
+    <div class="col-lg-8">
+      <!-- Edit Profile form card -->
+      <div class="card glass-card border-0 p-4 shadow mb-4">
+        <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+          <span class="material-icons text-teal">manage_accounts</span>
+          <span>Edit Account Profile</span>
         </h5>
 
-        <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
-          <!-- Full Name -->
-          <div class="mb-3">
-            <label for="name" class="form-label text-muted small">Full Name</label>
-            <input type="text" id="name" name="name" class="form-control glass-input w-100" [(ngModel)]="name" required />
-          </div>
+        <form (ngSubmit)="saveProfile()">
+          <div class="row g-3">
+            <!-- Full Name -->
+            <div class="col-md-6">
+              <label for="profName" class="form-label fw-semibold text-secondary small">Full Name</label>
+              <input type="text" id="profName" class="form-control glass-input w-100" [(ngModel)]="name" name="profName" />
+            </div>
 
-          <div class="row g-3 mb-3">
+            <!-- Email Address (Read-only) -->
+            <div class="col-md-6">
+              <label for="profEmail" class="form-label fw-semibold text-secondary small">Email Address</label>
+              <input type="email" id="profEmail" class="form-control glass-input w-100 bg-secondary-subtle" [value]="email" disabled />
+            </div>
+
+            <!-- Password Change -->
+            <div class="col-md-12">
+              <label for="profPassword" class="form-label fw-semibold text-secondary small">Change Password</label>
+              <input type="password" id="profPassword" class="form-control glass-input w-100" 
+                     placeholder="•••••••• (Leave blank to keep current password)" [(ngModel)]="password" name="profPassword" />
+            </div>
+
+            <h6 class="fw-bold text-dark mt-4 mb-2 d-flex align-items-center gap-2">
+              <span class="material-icons text-teal">monitor_heart</span>
+              <span>Health Diagnostics Metrics</span>
+            </h6>
+
             <!-- Age -->
-            <div class="col-6">
-              <label for="age" class="form-label text-muted small">Age (Years)</label>
-              <input type="number" id="age" name="age" class="form-control glass-input w-100" [(ngModel)]="age" />
+            <div class="col-md-3">
+              <label for="profAge" class="form-label fw-semibold text-secondary small">Age (Years)</label>
+              <input type="number" id="profAge" class="form-control glass-input w-100" [(ngModel)]="age" name="profAge" />
+            </div>
+
+            <!-- Weight -->
+            <div class="col-md-3">
+              <label for="profWeight" class="form-label fw-semibold text-secondary small">Weight (kg)</label>
+              <input type="number" id="profWeight" class="form-control glass-input w-100" [(ngModel)]="weight" name="profWeight" />
+            </div>
+
+            <!-- Height -->
+            <div class="col-md-3">
+              <label for="profHeight" class="form-label fw-semibold text-secondary small">Height (cm)</label>
+              <input type="number" id="profHeight" class="form-control glass-input w-100" [(ngModel)]="height" name="profHeight" />
             </div>
 
             <!-- Blood Group -->
-            <div class="col-6">
-              <label for="bloodGroup" class="form-label text-muted small">Blood Group</label>
-              <select id="bloodGroup" name="bloodGroup" class="form-select glass-input w-100" [(ngModel)]="bloodGroup">
-                <option value="">Select Group</option>
+            <div class="col-md-3">
+              <label for="profBlood" class="form-label fw-semibold text-secondary small">Blood Group</label>
+              <select id="profBlood" class="form-select glass-input w-100" [(ngModel)]="bloodGroup" name="profBlood">
+                <option value="">Choose...</option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -44,104 +114,90 @@
                 <option value="O-">O-</option>
               </select>
             </div>
-          </div>
 
-          <div class="row g-3 mb-3">
-            <!-- Weight -->
-            <div class="col-6">
-              <label for="weight" class="form-label text-muted small">Weight (kg)</label>
-              <input type="number" id="weight" name="weight" class="form-control glass-input w-100" [(ngModel)]="weight" />
+            <!-- Allergies text -->
+            <div class="col-md-12">
+              <label for="profAllergies" class="form-label fw-semibold text-secondary small">Allergies (comma-separated)</label>
+              <input type="text" id="profAllergies" class="form-control glass-input w-100" 
+                     placeholder="e.g. Penicillin, Peanuts, Pollen" [(ngModel)]="allergiesText" name="profAllergies" />
             </div>
 
-            <!-- Height -->
-            <div class="col-6">
-              <label for="height" class="form-label text-muted small">Height (cm)</label>
-              <input type="number" id="height" name="height" class="form-control glass-input w-100" [(ngModel)]="height" />
-            </div>
-          </div>
-
-          <!-- Allergies -->
-          <div class="mb-4">
-            <label for="allergies" class="form-label text-muted small">Allergies (Comma separated)</label>
-            <input type="text" id="allergies" name="allergiesText" class="form-control glass-input w-100" placeholder="e.g. Penicillin, Peanuts, Pollen" [(ngModel)]="allergiesText" />
-          </div>
-
-          <button type="submit" class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2" [disabled]="isSaving()">
-            @if (isSaving()) {
-              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              <span>Saving Health profile...</span>
-            } @else {
-              <span class="material-icons">save</span>
-              <span>Update Profile</span>
-            }
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Right Column: Medication Alarms Tracker -->
-    <div class="col-lg-6">
-      <div class="card glass-card border-0 p-4 shadow-lg h-100">
-        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2 d-flex align-items-center gap-2">
-          <span class="material-icons text-teal" style="color: #0d9488;">alarm</span>
-          <span>Pill Medication Alarms Calendar</span>
-        </h5>
-
-        <!-- Add alarm Form -->
-        <div class="p-3 border rounded-4 mb-4 bg-light" style="border-radius: 12px;">
-          <h6 class="fw-bold mb-3 small text-secondary uppercase-label">Add New Medication Reminder</h6>
-          <div class="row g-2">
-            <div class="col-md-5">
-              <input type="text" class="form-control glass-input w-100 py-2" placeholder="Medicine Name" [(ngModel)]="newMedicineName" />
-            </div>
-            <div class="col-md-3">
-              <input type="text" class="form-control glass-input w-100 py-2" placeholder="Dosage (e.g. 1 tab)" [(ngModel)]="newDosage" />
-            </div>
-            <div class="col-md-2">
-              <input type="time" class="form-control glass-input w-100 py-2" [(ngModel)]="newTime" style="padding: 6px 8px !important;" />
-            </div>
-            <div class="col-md-2">
-              <button type="button" class="btn btn-premium w-100 py-2" (click)="addReminder()">
-                <span class="material-icons" style="vertical-align: middle;">add</span>
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-teal-premium w-100 py-3" [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="spinner-border spinner-border-sm" role="status"></span>
+                  <span>Saving Health Profile...</span>
+                } @else {
+                  <span>Save Changes</span>
+                }
               </button>
             </div>
           </div>
-        </div>
+        </form>
+      </div>
 
-        <!-- Reminders List -->
+      <!-- Medication Alarms Card -->
+      <div class="card glass-card border-0 p-4 shadow">
+        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <span class="material-icons text-teal">alarm</span>
+          <span>Medication Alarm Reminders</span>
+        </h5>
+        <p class="text-secondary small mb-4">Set up local pill cycle alerts. Alarms will notify you when it's time to take your doses.</p>
+
+        <!-- Reminders list -->
         @if (reminders.length === 0) {
-          <div class="text-center py-4 text-muted">
-            <span class="material-icons text-muted" style="font-size: 2.5rem;">alarm_off</span>
-            <p class="small mt-2">No alarms configured yet. Setup a pill cycle reminder above.</p>
+          <div class="text-center py-4 bg-light rounded-4 mb-4 border">
+            <span class="material-icons text-muted" style="font-size: 2.5rem;">notifications_off</span>
+            <p class="text-muted small mt-2 mb-0">No active medication alarms. Add one below!</p>
           </div>
         } @else {
-          <div class="d-flex flex-column gap-3" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
-            @for (rem of reminders; track $index) {
-              <div class="card p-3 border d-flex flex-row justify-content-between align-items-center flex-wrap gap-2" style="border-radius: 12px; background: rgba(255,255,255,0.6);">
+          <div class="list-group mb-4" style="border-radius: 12px; overflow: hidden;">
+            @for (reminder of reminders; track $index) {
+              <div class="list-group-item d-flex justify-content-between align-items-center py-3 bg-light border-bottom-0">
                 <div class="d-flex align-items-center gap-3">
-                  <span class="material-icons text-teal" [style.color]="rem.active ? '#0d9488' : '#94a3b8'" style="font-size: 2.2rem;">
-                    {{ rem.active ? 'notifications_active' : 'notifications_off' }}
-                  </span>
-                  <div>
-                    <h6 class="fw-bold mb-0 text-dark" [style.text-decoration]="rem.active ? 'none' : 'line-through'">{{ rem.medicineName }}</h6>
-                    <p class="small text-muted mb-0">🕒 {{ rem.time }} &bull; {{ rem.dosage }} &bull; {{ rem.frequency }}</p>
-                  </div>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                  <!-- Toggle status -->
-                  <div class="form-check form-switch mb-0">
-                    <input class="form-check-input" type="checkbox" role="switch" [checked]="rem.active" (change)="toggleReminder($index)" style="cursor: pointer;">
-                  </div>
-                  <!-- Delete button -->
-                  <button type="button" class="btn btn-link text-danger p-0" (click)="removeReminder($index)">
-                    <span class="material-icons">delete_outline</span>
+                  <button class="btn p-0 text-teal" (click)="toggleReminder($index)">
+                    <span class="material-icons" style="font-size: 1.8rem;">
+                      {{ reminder.active ? 'alarm_on' : 'alarm_off' }}
+                    </span>
                   </button>
+                  <div>
+                    <h6 class="fw-bold mb-0 text-dark" [style.text-decoration]="reminder.active ? 'none' : 'line-through'">
+                      {{ reminder.medicineName }}
+                    </h6>
+                    <span class="text-muted" style="font-size: 0.75rem;">💊 {{ reminder.dosage }} | ⏰ {{ reminder.time }}</span>
+                  </div>
                 </div>
+                <button class="btn btn-outline-danger btn-sm border-0" (click)="removeReminder($index)">
+                  <span class="material-icons" style="font-size: 1.2rem;">delete</span>
+                </button>
               </div>
             }
           </div>
         }
+
+        <!-- Add Reminder Form -->
+        <div class="bg-light p-3 rounded-4 border">
+          <h6 class="fw-bold text-dark mb-3 small">Create New Pill Alert</h6>
+          <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label text-secondary small mb-1">Medicine Name</label>
+              <input type="text" class="form-control glass-input w-100" placeholder="e.g. Crocin" [(ngModel)]="newMedicineName" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label text-secondary small mb-1">Dosage</label>
+              <input type="text" class="form-control glass-input w-100" placeholder="e.g. 1 tablet" [(ngModel)]="newDosage" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label text-secondary small mb-1">Time</label>
+              <input type="time" class="form-control glass-input w-100" [(ngModel)]="newTime" />
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-teal-premium w-100 py-2 d-flex align-items-center justify-content-center" (click)="addReminder()">
+                <span class="material-icons">add</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

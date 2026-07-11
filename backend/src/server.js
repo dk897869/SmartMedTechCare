@@ -43,6 +43,7 @@ const medicineRoutes = require("./routes/medicineRoutes");
 const pharmacyRoutes = require("./routes/pharmacyRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 // Mount Routes
 app.use("/api/auth", authRoutes);
@@ -51,6 +52,7 @@ app.use("/api/medicines", medicineRoutes);
 app.use("/api/pharmacies", pharmacyRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/contacts", contactRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

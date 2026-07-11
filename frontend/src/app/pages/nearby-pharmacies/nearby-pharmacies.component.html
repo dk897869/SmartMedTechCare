@@ -1,154 +1,621 @@
-<div class="container py-5 animate-fade-in-up">
-  <div class="row mb-4">
-    <div class="col-12 text-center">
-      <h1 class="fw-bold text-dark mb-2">Nearby Partner Pharmacies</h1>
-      <p class="text-muted">Explore regional pharmacy listings near your GPS location and check their distance.</p>
+<div class="container py-4 animate-fade-in-up">
+  
+  <!-- Header & Search Section -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-md-5">
+      <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem; letter-spacing: -0.5px;">Find Nearby Pharmacies</h2>
+      <p class="text-muted small mb-0">Get medicines from trusted pharmacies near you</p>
+    </div>
+    <div class="col-md-5">
+      <div class="input-group search-container-group shadow-sm">
+        <span class="input-group-text bg-white border-end-0 ps-3">
+          <span class="material-icons text-secondary" style="font-size: 1.2rem;">search</span>
+        </span>
+        <input 
+          type="text" 
+          class="form-control border-start-0 ps-1" 
+          placeholder="Search medicine, pharmacy, area, pincode..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          style="border-radius: 0;"
+        />
+        <button class="btn btn-emerald px-3" type="button">
+          <span class="material-icons text-white" style="font-size: 1.2rem;">search</span>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-2 text-md-end text-start">
+      <div class="d-flex align-items-center justify-content-md-end justify-content-start gap-2">
+        <span class="small fw-semibold text-secondary" style="font-size: 0.82rem;">Use Current Location</span>
+        <div class="form-check form-switch mb-0">
+          <input 
+            class="form-check-input custom-green-switch" 
+            type="checkbox" 
+            role="switch" 
+            [checked]="useCurrentLocation()"
+            (change)="onLocationToggleChange()"
+          />
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="row g-4">
-    <!-- Left Column: Pharmacy List -->
-    <div class="col-lg-5">
-      <div class="card glass-card border-0 p-4 shadow mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-teal" style="color: #0d9488;">📍 Store Listings</h5>
-          <button class="btn btn-light btn-sm border d-flex align-items-center gap-1" (click)="detectAndFetch()">
-            <span class="material-icons" style="font-size: 1rem;">my_location</span>
-            <span>Refresh GPS</span>
-          </button>
+  <!-- Regional Selector & Dropdowns Row -->
+  <div class="row g-2 mb-4 align-items-center">
+    <!-- State -->
+    <div class="col-lg col-md-4 col-6">
+      <div class="filter-select-wrapper d-flex align-items-center px-3 shadow-sm bg-white rounded-3 border">
+        <span class="material-icons text-muted me-2" style="font-size: 1.1rem;">apartment</span>
+        <div class="flex-grow-1 select-box-parent">
+          <span class="select-label">State</span>
+          <select class="form-select border-0 p-0 shadow-none" [ngModel]="selectedState" (ngModelChange)="onStateChange($event)">
+            @for (st of states; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
         </div>
+      </div>
+    </div>
 
-        <div class="alert alert-secondary p-2 mb-3 border bg-white" style="border-radius: 8px;">
-          <p class="small text-muted mb-0 d-flex align-items-center gap-1">
-            <span class="material-icons text-teal" style="font-size: 1rem; color: #0d9488;">location_on</span>
-            <span><strong>Live GPS:</strong> Lat: {{ userCoords().lat.toFixed(4) }}, Lng: {{ userCoords().lng.toFixed(4) }} ({{ userCoords().address }})</span>
-          </p>
+    <!-- City -->
+    <div class="col-lg col-md-4 col-6">
+      <div class="filter-select-wrapper d-flex align-items-center px-3 shadow-sm bg-white rounded-3 border">
+        <span class="material-icons text-muted me-2" style="font-size: 1.1rem;">location_city</span>
+        <div class="flex-grow-1 select-box-parent">
+          <span class="select-label">City</span>
+          <select class="form-select border-0 p-0 shadow-none" [ngModel]="selectedCity" (ngModelChange)="onCityChange($event)">
+            @for (c of citiesMap[selectedState]; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
         </div>
+      </div>
+    </div>
 
+    <!-- Area -->
+    <div class="col-lg col-md-4 col-6">
+      <div class="filter-select-wrapper d-flex align-items-center px-3 shadow-sm bg-white rounded-3 border">
+        <span class="material-icons text-muted me-2" style="font-size: 1.1rem;">pin_drop</span>
+        <div class="flex-grow-1 select-box-parent">
+          <span class="select-label">Area</span>
+          <select class="form-select border-0 p-0 shadow-none" [(ngModel)]="selectedArea">
+            @for (a of areasMap[selectedCity] || []; track a) {
+              <option [value]="a">{{ a }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sector -->
+    <div class="col-lg col-md-4 col-6">
+      <div class="filter-select-wrapper d-flex align-items-center px-3 shadow-sm bg-white rounded-3 border">
+        <span class="material-icons text-muted me-2" style="font-size: 1.1rem;">holiday_village</span>
+        <div class="flex-grow-1 select-box-parent">
+          <span class="select-label">Sector</span>
+          <select class="form-select border-0 p-0 shadow-none" [(ngModel)]="selectedSector">
+            @for (sec of sectors; track sec) {
+              <option [value]="sec">{{ sec }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pincode -->
+    <div class="col-lg col-md-4 col-6">
+      <div class="filter-select-wrapper d-flex align-items-center px-3 shadow-sm bg-white rounded-3 border">
+        <span class="material-icons text-muted me-2" style="font-size: 1.1rem;">local_post_office</span>
+        <div class="flex-grow-1 select-box-parent">
+          <span class="select-label">Pincode</span>
+          <select class="form-select border-0 p-0 shadow-none" [(ngModel)]="selectedPincode">
+            @for (pc of pincodes; track pc) {
+              <option [value]="pc">{{ pc }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Filters Button -->
+    <div class="col-lg-auto col-md-4 col-6 text-end">
+      <button class="btn btn-outline-filters w-100 d-flex align-items-center justify-content-center gap-2 py-3 rounded-3">
+        <span class="material-icons" style="font-size: 1.15rem;">tune</span>
+        <span>Filters</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Primary Double Column Layout -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Left Column: Pharmacy listings -->
+    <div class="col-lg-5 col-12">
+      
+      <!-- Counter and sort bar -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons text-emerald" style="font-size: 1.5rem;">storefront</span>
+          <div>
+            <h6 class="fw-bold mb-0 text-dark">{{ totalPharmaciesCount() }} Pharmacies Found</h6>
+            <span class="text-muted small" style="font-size: 0.72rem;">Within {{ searchRadius() }} km radius</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <span class="text-muted small me-1">Sort by</span>
+          <select class="form-select form-select-sm border-0 bg-transparent fw-semibold text-dark shadow-none cursor-pointer" style="width: auto;">
+            <option>Nearest</option>
+            <option>Highest Rating</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scrollable Pharmacy Cards List -->
+      <div class="pharmacies-list-scrollable pe-2" style="max-height: 490px; overflow-y: auto;">
         @if (isLoading()) {
           <div class="text-center py-5">
-            <div class="spinner-border text-teal" role="status">
+            <div class="spinner-border text-emerald" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="text-muted mt-2 small">Locating stores...</p>
+            <p class="text-muted mt-2 small">Locating medical stores...</p>
+          </div>
+        } @else if (filteredPharmacies().length === 0) {
+          <div class="text-center py-5 bg-white border rounded-4">
+            <span class="material-icons text-muted" style="font-size: 3rem;">store_mall_directory</span>
+            <h6 class="fw-bold mt-2 text-dark">No Stores Found</h6>
+            <p class="text-muted small mb-0 px-3">Try widening your search radius slider or choosing another city.</p>
           </div>
         } @else {
-          @if (pharmacies().length === 0) {
-            <div class="alert alert-warning text-center small py-4">
-              ⚠️ No partner pharmacies found within 15 km of your location. Try reloading GPS.
-            </div>
-          } @else {
-            <div class="d-flex flex-column gap-3" style="max-height: 480px; overflow-y: auto; padding-right: 4px;">
-              @for (ph of pharmacies(); track ph._id) {
-                <div
-                  class="card p-3 border cursor-pointer select-hover-card"
-                  [class.border-teal]="selectedPharmacy()?._id === ph._id"
-                  [style.background]="selectedPharmacy()?._id === ph._id ? '#f0fdfa' : 'white'"
-                  style="border-radius: 12px; transition: all 0.2s;"
-                  (click)="selectPharmacy(ph)"
-                >
-                  <div class="d-flex justify-content-between align-items-start mb-1">
-                    <h6 class="fw-bold text-dark mb-0">{{ ph.name }}</h6>
-                    <span class="badge bg-teal-soft text-teal font-semibold small" style="background-color: #e6fbf7; color: #0d9488;">
-                      {{ ph.distance }} km away
+          @for (ph of filteredPharmacies(); track ph._id) {
+            <div 
+              class="card p-3 border mb-3 cursor-pointer pharmacy-card-item shadow-sm"
+              [class.active-pharmacy-card]="selectedPharmacy()?._id === ph._id"
+              (click)="selectPharmacy(ph)"
+            >
+              <div class="d-flex align-items-start gap-3">
+                
+                <!-- Logo Avatar circle -->
+                <div class="pharmacy-avatar-icon d-flex align-items-center justify-content-center text-white" [style.background-color]="getPinColor(ph.name)">
+                  <span class="material-icons" style="font-size: 1.3rem;">local_hospital</span>
+                </div>
+
+                <!-- Info contents -->
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="fw-bold text-dark mb-0 card-title-hover">{{ ph.name }}</h6>
+                    <span class="badge bg-emerald-soft text-emerald font-semibold small rounded-pill px-2">
+                      {{ ph.distance }} km
                     </span>
                   </div>
+
+                  <!-- Verified and Rating tag row -->
                   <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="text-warning small">⭐ {{ ph.rating }} Rating</span>
-                    <span class="text-muted small">&bull; {{ ph.contact }}</span>
+                    <span class="badge bg-verified-badge text-emerald d-flex align-items-center gap-1 font-semibold" style="font-size: 0.72rem;">
+                      <span class="material-icons" style="font-size: 0.85rem;">verified</span>
+                      <span>Verified</span>
+                    </span>
+                    <span class="text-warning d-flex align-items-center gap-1 small fw-semibold">
+                      <span class="material-icons" style="font-size: 0.95rem;">star</span>
+                      <span>{{ ph.rating }}</span>
+                    </span>
                   </div>
-                  <p class="small text-muted mb-2">{{ ph.address }}</p>
+
+                  <p class="small text-secondary mb-2" style="font-size: 0.8rem; line-height: 1.4;">
+                    📍 {{ ph.address }}
+                  </p>
                   
-                  <div class="d-flex gap-2">
-                    <a routerLink="/medicines" class="btn btn-outline-teal btn-sm px-3 flex-grow-1" style="border-color: #0d9488; color: #0d9488; font-size: 0.8rem; border-radius: 8px;">
-                      View Store Stock
-                    </a>
+                  <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: #f1f5f9 !important;">
+                    <div class="d-flex flex-column text-start">
+                      <span class="open-status-text" style="color: #10b981;">Open &bull; Closes at 11:00 PM</span>
+                      <span class="delivery-time-tag text-muted small d-flex align-items-center gap-1" style="font-size: 0.72rem; margin-top: 1px;">
+                        <span class="material-icons" style="font-size: 0.85rem;">pedal_bike</span>
+                        <span>25 mins delivery</span>
+                      </span>
+                    </div>
+                    
+                    <!-- Action circular icons and stock button -->
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="btn btn-light border-circle-icon" type="button" (click)="$event.stopPropagation(); triggerCall(ph.contact)">
+                        <span class="material-icons text-secondary" style="font-size: 1rem;">phone</span>
+                      </button>
+                      <button class="btn btn-light border-circle-icon" type="button" (click)="$event.stopPropagation(); triggerDirections(ph.name)">
+                        <span class="material-icons text-secondary" style="font-size: 1rem;">navigation</span>
+                      </button>
+                      <button 
+                        class="btn btn-outline-stock px-3 py-1 fw-bold" 
+                        type="button"
+                        [routerLink]="['/medicines']"
+                        (click)="$event.stopPropagation();"
+                      >
+                        View Stock
+                      </button>
+                    </div>
                   </div>
+
                 </div>
-              }
+              </div>
             </div>
           }
         }
       </div>
+
+      <!-- Load more pharmacies link -->
+      <div class="text-center mt-3">
+        <button class="btn btn-link text-decoration-none text-muted small d-flex align-items-center justify-content-center gap-1 mx-auto fw-semibold">
+          <span>Load More Pharmacies</span>
+          <span class="material-icons" style="font-size: 1.1rem;">expand_more</span>
+        </button>
+      </div>
+
     </div>
 
-    <!-- Right Column: Interactive Styled Mock Map (SVG/HTML Canvas) -->
-    <div class="col-lg-7">
-      <div class="card glass-card border-0 p-4 shadow-lg text-center h-100 d-flex flex-column" style="min-height: 400px;">
-        <h5 class="fw-bold text-dark mb-3 text-start d-flex align-items-center gap-2">
-          <span class="material-icons text-teal" style="color: #0d9488;">map</span>
-          <span>Interactive Radar Map View</span>
-        </h5>
+    <!-- Right Column: Styled Map Box & Controls -->
+    <div class="col-lg-7 col-12 d-flex flex-column">
+      <div class="card border-0 shadow-sm flex-grow-1 p-0 overflow-hidden bg-white" style="border-radius: 16px; min-height: 480px; position: relative;">
+        
+        <!-- Toggle view mode on Map Top Left -->
+        <div class="position-absolute map-type-overlay d-flex rounded-3 p-1 shadow-sm bg-white border" style="top: 16px; left: 16px; z-index: 10;">
+          <button 
+            type="button" 
+            class="btn btn-sm px-3 fw-bold rounded-2 transition-all"
+            [class.btn-map-active]="mapMode() === 'map'"
+            [class.btn-light]="mapMode() !== 'map'"
+            (click)="setMapMode('map')"
+          >
+            Map
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-sm px-3 fw-bold rounded-2 transition-all"
+            [class.btn-map-active]="mapMode() === 'satellite'"
+            [class.btn-light]="mapMode() !== 'satellite'"
+            (click)="setMapMode('satellite')"
+          >
+            Satellite
+          </button>
+        </div>
 
-        <div class="flex-grow-1 border rounded-4 position-relative overflow-hidden" style="background-color: #0f172a; min-height: 380px;">
-          <!-- Custom SVG grid and nodes mapping -->
-          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; top:0; left:0;">
-            <!-- Background Roads Grid representation -->
-            <line x1="0" y1="20" x2="100" y2="20" stroke="#334155" stroke-width="0.75" />
-            <line x1="0" y1="50" x2="100" y2="50" stroke="#334155" stroke-width="0.75" />
-            <line x1="0" y1="80" x2="100" y2="80" stroke="#334155" stroke-width="0.75" />
-            <line x1="30" y1="0" x2="30" y2="100" stroke="#334155" stroke-width="0.75" />
-            <line x1="70" y1="0" x2="70" y2="100" stroke="#334155" stroke-width="0.75" />
+        <!-- Custom SVG drawing vector map matching Sector 70 grids -->
+        <div 
+          class="map-draw-canvas w-100 h-100 flex-grow-1 position-relative" 
+          [class.satellite-background-grid]="mapMode() === 'satellite'"
+          style="background-color: #f8fafc; transition: all 0.4s; overflow: hidden; min-height: 440px;"
+        >
+          <!-- SVG roads layout grid -->
+          <svg 
+            width="100%" 
+            height="100%" 
+            viewBox="0 0 500 350" 
+            preserveAspectRatio="xMidYMid slice" 
+            [style.transform]="'scale(' + zoomLevel() + ')'"
+            style="position: absolute; top:0; left:0; width:100%; height:100%; transition: transform 0.3s;"
+          >
+            <!-- Map road grids -->
+            <path d="M 0 50 L 500 50" stroke="#e2e8f0" stroke-width="8" fill="none" />
+            <path d="M 0 160 L 500 160" stroke="#e2e8f0" stroke-width="8" fill="none" />
+            <path d="M 0 280 L 500 280" stroke="#e2e8f0" stroke-width="8" fill="none" />
+            <path d="M 120 0 L 120 350" stroke="#e2e8f0" stroke-width="8" fill="none" />
+            <path d="M 320 0 L 320 350" stroke="#e2e8f0" stroke-width="8" fill="none" />
 
-            <!-- User GPS Position Node -->
-            @if (userCoords()) {
-              <!-- Glowing circle halos -->
-              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="8" fill="#0ea5e9" opacity="0.2" class="pulse-animation" />
-              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="4" fill="#0ea5e9" opacity="0.4" />
-              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="2" fill="#ffffff" />
-            }
+            <!-- Sector text labels -->
+            <text x="50" y="35" fill="#94a3b8" font-size="9" font-weight="bold" font-family="Outfit, sans-serif">SECTOR 83</text>
+            <text x="350" y="35" fill="#94a3b8" font-size="9" font-weight="bold" font-family="Outfit, sans-serif">SECTOR 69</text>
+            <text x="210" y="145" fill="#94a3b8" font-size="9" font-weight="bold" font-family="Outfit, sans-serif">SECTOR 70</text>
+            <text x="50" y="265" fill="#94a3b8" font-size="9" font-weight="bold" font-family="Outfit, sans-serif">SECTOR 68</text>
+            <text x="350" y="265" fill="#94a3b8" font-size="9" font-weight="bold" font-family="Outfit, sans-serif">PHASE 7</text>
+            <text x="210" y="35" fill="#cbd5e1" font-size="7" font-weight="semibold" font-family="Outfit, sans-serif">AIRPORT ROAD</text>
+
+            <!-- User GPS Location coordinate node: Placed at (230, 180) -->
+            <!-- Halo rings -->
+            <circle cx="230" cy="180" r="28" fill="#3b82f6" opacity="0.12" />
+            <circle cx="230" cy="180" r="16" fill="#3b82f6" opacity="0.22" />
+            <!-- Blue dot -->
+            <circle cx="230" cy="180" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="1.8" />
 
             <!-- Pharmacy pins -->
-            @for (p of pharmacies(); track p._id) {
-              <!-- Draw lines connect user to active selection store -->
+            @for (p of filteredPharmacies(); track p._id) {
+              <!-- Draw path line connect user to active selection pin -->
               @if (selectedPharmacy()?._id === p._id) {
-                <line
-                  [attr.x1]="getSvgCoords(userCoords().lat, userCoords().lng).x"
-                  [attr.y1]="getSvgCoords(userCoords().lat, userCoords().lng).y"
-                  [attr.x2]="getSvgCoords(p.location.lat, p.location.lng).x"
-                  [attr.y2]="getSvgCoords(p.location.lat, p.location.lng).y"
-                  stroke="#14b8a6"
-                  stroke-width="0.5"
-                  stroke-dasharray="2,2"
+                <line 
+                  x1="230" 
+                  y1="180" 
+                  [attr.x2]="getMapCoords(p.name).x" 
+                  [attr.y2]="getMapCoords(p.name).y" 
+                  stroke="#10b981" 
+                  stroke-width="1.5" 
+                  stroke-dasharray="4,4" 
                 />
+                
+                <!-- Floating distance box helper -->
+                <rect 
+                  [attr.x]="((230 + getMapCoords(p.name).x)/2) - 18" 
+                  [attr.y]="((180 + getMapCoords(p.name).y)/2) - 6" 
+                  width="36" 
+                  height="12" 
+                  rx="4" 
+                  fill="#10b981" 
+                />
+                <text 
+                  [attr.x]="((230 + getMapCoords(p.name).x)/2)" 
+                  [attr.y]="((180 + getMapCoords(p.name).y)/2) + 3" 
+                  fill="#ffffff" 
+                  font-size="6" 
+                  font-weight="bold" 
+                  text-anchor="middle"
+                  font-family="Outfit"
+                >
+                  {{ p.distance }} km
+                </text>
               }
 
-              <!-- Pharmacy Node Circle pin -->
-              <circle
-                [attr.cx]="getSvgCoords(p.location.lat, p.location.lng).x"
-                [attr.cy]="getSvgCoords(p.location.lat, p.location.lng).y"
-                [attr.r]="selectedPharmacy()?._id === p._id ? 4 : 3"
-                [attr.fill]="selectedPharmacy()?._id === p._id ? '#14b8a6' : '#94a3b8'"
-                [attr.stroke]="selectedPharmacy()?._id === p._id ? '#ffffff' : 'none'"
-                stroke-width="0.5"
-                (click)="selectPharmacy(p)"
-                style="cursor: pointer; transition: all 0.2s;"
-              />
+              <!-- Pin group container -->
+              <g (click)="selectPharmacy(p)" style="cursor: pointer;">
+                <!-- Pin marker drop shadow -->
+                <circle [attr.cx]="getMapCoords(p.name).x" [attr.cy]="getMapCoords(p.name).y" r="12" fill="#000000" opacity="0.08" />
+                
+                <!-- Circle background -->
+                <circle 
+                  [attr.cx]="getMapCoords(p.name).x" 
+                  [attr.cy]="getMapCoords(p.name).y" 
+                  [attr.r]="selectedPharmacy()?._id === p._id ? 10 : 8" 
+                  [attr.fill]="getPinColor(p.name)"
+                  stroke="#ffffff"
+                  [attr.stroke-width]="selectedPharmacy()?._id === p._id ? 2 : 1.5"
+                />
+                
+                <!-- White cross sign in circle center -->
+                <path 
+                  [attr.d]="'M ' + (getMapCoords(p.name).x - 3) + ' ' + getMapCoords(p.name).y + ' L ' + (getMapCoords(p.name).x + 3) + ' ' + getMapCoords(p.name).y + ' M ' + getMapCoords(p.name).x + ' ' + (getMapCoords(p.name).y - 3) + ' L ' + getMapCoords(p.name).x + ' ' + (getMapCoords(p.name).y + 3)" 
+                  stroke="#ffffff" 
+                  stroke-width="1.5" 
+                  fill="none" 
+                />
+              </g>
             }
           </svg>
 
-          <!-- Label Overlays on screen -->
-          <div class="position-absolute p-2 bg-dark rounded border border-secondary small text-start" style="top: 12px; left: 12px; opacity: 0.85; background: #1e293b !important; color: #cbd5e1; border-color: #475569 !important;">
-            <div class="d-flex align-items-center gap-1"><span class="badge bg-info" style="width: 10px; height: 10px; padding: 0; border-radius: 50%;"></span> <span>User Location</span></div>
-            <div class="d-flex align-items-center gap-1 mt-1"><span class="badge bg-teal" style="width: 10px; height: 10px; padding: 0; border-radius: 50%; background-color: #14b8a6;"></span> <span>Pharmacy Partner</span></div>
-          </div>
-
-          <!-- Active Selection Summary overlay -->
+          <!-- Floating Detail Card Overlay on Map (Apollo Pharmacy card style) -->
           @if (selectedPharmacy()) {
-            <div class="position-absolute p-3 bg-dark rounded-4 shadow-lg border border-secondary text-start animate-fade-in-up" style="bottom: 12px; left: 12px; right: 12px; opacity: 0.95; background: #1e293b !important; border-color: #475569 !important; color: #f8fafc;">
-              <h6 class="fw-bold mb-0 text-teal d-flex align-items-center gap-1" style="color: #2dd4bf;">
-                <span class="material-icons" style="font-size: 1.1rem;">local_hospital</span>
-                <span>{{ selectedPharmacy()?.name }}</span>
-              </h6>
-              <p class="small text-muted mb-2">{{ selectedPharmacy()?.address }}</p>
-              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top border-secondary">
-                <span class="small">📏 Distance: <strong>{{ selectedPharmacy()?.distance }} km</strong></span>
-                <span class="small">⭐ Rating: <strong>{{ selectedPharmacy()?.rating }} / 5.0</strong></span>
+            <div class="position-absolute map-card-detail shadow shadow-lg p-3 rounded-4 bg-white border border-light animate-fade-in-up" style="top: 16px; right: 16px; width: 280px; z-index: 10;">
+              
+              <!-- Close detail button -->
+              <button type="button" class="btn-close position-absolute" style="top: 12px; right: 12px; font-size: 0.72rem;" (click)="selectedPharmacy.set(null)"></button>
+              
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <!-- Circular Icon -->
+                <div class="d-flex align-items-center justify-content-center text-white" [style.background-color]="getPinColor(selectedPharmacy()!.name)" style="width: 28px; height: 28px; border-radius: 50%;">
+                  <span class="material-icons" style="font-size: 1rem;">local_hospital</span>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">{{ selectedPharmacy()?.name }}</h6>
+                  <div class="d-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                    <span class="text-warning d-flex align-items-center"><span class="material-icons" style="font-size: 0.8rem;">star</span> 4.8</span>
+                    <span class="text-muted">(325 reviews)</span>
+                    <span class="text-emerald font-semibold ms-1">{{ selectedPharmacy()?.distance }} km away</span>
+                  </div>
+                </div>
               </div>
+
+              <!-- Address and properties -->
+              <p class="text-secondary small mb-2" style="font-size: 0.76rem; line-height: 1.4;">
+                📍 {{ selectedPharmacy()?.address }}
+              </p>
+              
+              <div class="d-flex flex-column text-start gap-1 mb-3">
+                <span class="small font-semibold text-emerald d-flex align-items-center gap-1" style="font-size: 0.74rem;">
+                  <span class="badge bg-emerald-soft text-emerald rounded-pill px-2">Open</span>
+                  <span>Closes at 11:00 PM</span>
+                </span>
+                <span class="text-muted d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+                  <span class="material-icons" style="font-size: 0.85rem;">local_shipping</span>
+                  <span>25 mins delivery</span>
+                </span>
+                <span class="text-muted d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+                  <span class="material-icons" style="font-size: 0.85rem;">description</span>
+                  <span>Prescription Accepted</span>
+                </span>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="d-flex gap-2">
+                <button class="btn btn-emerald flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-1 text-white fw-bold" style="font-size: 0.8rem;" (click)="viewMedicinesOfSelected()">
+                  <span class="material-icons" style="font-size: 1rem;">shopping_cart</span>
+                  <span>View Medicines</span>
+                </button>
+                <button class="btn btn-outline-light border text-secondary px-2" (click)="triggerDirections(selectedPharmacy()!.name)">
+                  <span class="material-icons" style="font-size: 1.05rem;">navigation</span>
+                </button>
+                <button class="btn btn-outline-light border text-secondary px-2">
+                  <span class="material-icons" style="font-size: 1.05rem;">bookmark_border</span>
+                </button>
+              </div>
+
             </div>
           }
+
+          <!-- Zoom in/out overlay controls on Bottom Right -->
+          <div class="position-absolute d-flex flex-column gap-2 shadow-sm" style="bottom: 16px; right: 16px; z-index: 10;">
+            <button type="button" class="btn btn-white circle-btn-map" (click)="detectAndFetch()">
+              <span class="material-icons text-secondary" style="font-size: 1.1rem;">gps_fixed</span>
+            </button>
+            <button type="button" class="btn btn-white circle-btn-map" (click)="zoomIn()">
+              <span class="material-icons text-secondary" style="font-size: 1.1rem;">add</span>
+            </button>
+            <button type="button" class="btn btn-white circle-btn-map" (click)="zoomOut()">
+              <span class="material-icons text-secondary" style="font-size: 1.1rem;">remove</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Radius Slider & Quick Filters row under map -->
+      <div class="card border-0 p-3 mt-3 shadow-sm bg-white" style="border-radius: 16px;">
+        <div class="row align-items-center g-3">
+          
+          <!-- Slider (left) -->
+          <div class="col-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-bold text-dark">Search Radius</span>
+              <span class="badge bg-emerald-soft text-emerald font-bold">{{ searchRadius() }} km</span>
+            </div>
+            
+            <!-- Slider input -->
+            <input 
+              type="range" 
+              class="form-range custom-green-range" 
+              min="2" 
+              max="50" 
+              [ngModel]="searchRadius()"
+              (ngModelChange)="searchRadius.set($event)"
+            />
+            
+            <div class="d-flex justify-content-between text-muted" style="font-size: 0.65rem; margin-top: -2px;">
+              <span>2 km</span>
+              <span>5 km</span>
+              <span>10 km</span>
+              <span>20 km</span>
+              <span>50 km</span>
+            </div>
+          </div>
+
+          <!-- Quick Filters (right) -->
+          <div class="col-md-7">
+            <div class="d-flex flex-wrap gap-1 align-items-center justify-content-md-end justify-content-start">
+              
+              <!-- Open Now -->
+              <button 
+                type="button" 
+                class="btn btn-sm btn-quick-filter d-flex align-items-center gap-1 py-1.5 px-2.5 rounded-pill"
+                [class.btn-quick-filter-active]="openNowFilter()"
+                (click)="toggleQuickFilter('open')"
+              >
+                <span class="material-icons" style="font-size: 0.95rem;">schedule</span>
+                <span>Open Now</span>
+              </button>
+
+              <!-- 24x7 -->
+              <button 
+                type="button" 
+                class="btn btn-sm btn-quick-filter d-flex align-items-center gap-1 py-1.5 px-2.5 rounded-pill"
+                [class.btn-quick-filter-active]="twentyFourSevenFilter()"
+                (click)="toggleQuickFilter('24x7')"
+              >
+                <span class="material-icons" style="font-size: 0.95rem;">dark_mode</span>
+                <span>24x7</span>
+              </button>
+
+              <!-- Delivery -->
+              <button 
+                type="button" 
+                class="btn btn-sm btn-quick-filter d-flex align-items-center gap-1 py-1.5 px-2.5 rounded-pill"
+                [class.btn-quick-filter-active]="deliveryFilter()"
+                (click)="toggleQuickFilter('delivery')"
+              >
+                <span class="material-icons" style="font-size: 0.95rem;">pedal_bike</span>
+                <span>Delivery</span>
+              </button>
+
+              <!-- Prescription -->
+              <button 
+                type="button" 
+                class="btn btn-sm btn-quick-filter d-flex align-items-center gap-1 py-1.5 px-2.5 rounded-pill"
+                [class.btn-quick-filter-active]="prescriptionFilter()"
+                (click)="toggleQuickFilter('rx')"
+              >
+                <span class="material-icons" style="font-size: 0.95rem;">receipt_long</span>
+                <span>Prescription</span>
+              </button>
+
+              <!-- More -->
+              <button type="button" class="btn btn-sm btn-light border py-1.5 px-2.5 rounded-pill text-secondary d-flex align-items-center gap-1">
+                <span>More</span>
+                <span class="material-icons" style="font-size: 0.85rem;">expand_more</span>
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom Stats Grid row -->
+  <div class="row g-3">
+    
+    <!-- Location Card -->
+    <div class="col-md col-sm-6 col-12">
+      <div class="card p-3 border-0 shadow-sm bg-white text-start d-flex align-items-start gap-2 h-100" style="border-radius: 12px;">
+        <div class="d-flex align-items-center justify-content-center text-emerald rounded-circle bg-emerald-soft" style="width: 28px; height: 28px;">
+          <span class="material-icons" style="font-size: 1.1rem;">location_on</span>
+        </div>
+        <div>
+          <span class="text-muted small uppercase-label" style="font-size: 0.68rem;">Your Location</span>
+          <h6 class="fw-bold text-dark mb-0 small" style="margin-top: 1px;">{{ selectedCity }}, Sector 70</h6>
+          <span class="text-emerald small cursor-pointer fw-semibold text-decoration-underline" style="font-size: 0.72rem;">Change</span>
         </div>
       </div>
     </div>
+
+    <!-- Nearest Pharmacy -->
+    <div class="col-md col-sm-6 col-12">
+      <div class="card p-3 border-0 shadow-sm bg-white text-start d-flex align-items-start gap-2 h-100" style="border-radius: 12px;">
+        <div class="d-flex align-items-center justify-content-center text-emerald rounded-circle bg-emerald-soft" style="width: 28px; height: 28px;">
+          <span class="material-icons" style="font-size: 1.1rem;">storefront</span>
+        </div>
+        <div>
+          <span class="text-muted small uppercase-label" style="font-size: 0.68rem;">Nearest Pharmacy</span>
+          <h6 class="fw-bold text-dark mb-0 small" style="margin-top: 1px;">{{ nearestNameText() }}</h6>
+          <span class="text-muted small" style="font-size: 0.72rem;">{{ nearestDistanceText() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Time -->
+    <div class="col-md col-sm-6 col-12">
+      <div class="card p-3 border-0 shadow-sm bg-white text-start d-flex align-items-start gap-2 h-100" style="border-radius: 12px;">
+        <div class="d-flex align-items-center justify-content-center text-emerald rounded-circle bg-emerald-soft" style="width: 28px; height: 28px;">
+          <span class="material-icons" style="font-size: 1.1rem;">pedal_bike</span>
+        </div>
+        <div>
+          <span class="text-muted small uppercase-label" style="font-size: 0.68rem;">Avg Delivery Time</span>
+          <h6 class="fw-bold text-dark mb-0 small" style="margin-top: 1px;">25-30 mins</h6>
+          <span class="text-muted small" style="font-size: 0.72rem;">🏍️ Fast Delivery</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Stores -->
+    <div class="col-md col-sm-6 col-12">
+      <div class="card p-3 border-0 shadow-sm bg-white text-start d-flex align-items-start gap-2 h-100" style="border-radius: 12px;">
+        <div class="d-flex align-items-center justify-content-center text-emerald rounded-circle bg-emerald-soft" style="width: 28px; height: 28px;">
+          <span class="material-icons" style="font-size: 1.1rem;">pin</span>
+        </div>
+        <div>
+          <span class="text-muted small uppercase-label" style="font-size: 0.68rem;">Total Pharmacies</span>
+          <h6 class="fw-bold text-dark mb-0 small" style="margin-top: 1px;">12</h6>
+          <span class="text-muted small" style="font-size: 0.72rem;">Within {{ searchRadius() }} km</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Range -->
+    <div class="col-md col-sm-6 col-12">
+      <div class="card p-3 border-0 shadow-sm bg-white text-start d-flex align-items-start gap-2 h-100" style="border-radius: 12px;">
+        <div class="d-flex align-items-center justify-content-center text-emerald rounded-circle bg-emerald-soft" style="width: 28px; height: 28px;">
+          <span class="material-icons" style="font-size: 1.1rem;">payments</span>
+        </div>
+        <div>
+          <span class="text-muted small uppercase-label" style="font-size: 0.68rem;">Price Range</span>
+          <h6 class="fw-bold text-dark mb-0 small" style="margin-top: 1px;">₹25 - ₹280</h6>
+          <span class="text-muted small" style="font-size: 0.72rem;">For common medicines</span>
+        </div>
+      </div>
+    </div>
+
   </div>
+
 </div>

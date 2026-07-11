@@ -60,63 +60,102 @@ export class LoginComponent {
   }
 
   loginWithGoogle() {
-    this.isLoading.set(true);
     Swal.fire({
-      title: 'Connecting to Google...',
-      text: 'Authenticating your secure Google profile.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
-    const googlePayload = {
-      name: 'Alex Google Test',
-      email: 'alex.google@gmail.com',
-      password: 'google_oauth_secure_password_123_bypass'
-    };
-
-    // Try registering. If user exists, try logging in
-    this.authService.register(googlePayload).subscribe({
-      next: (res) => {
-        Swal.close();
-        this.isLoading.set(false);
-        if (res.success) {
-          Swal.fire({
-            title: 'Google Login Successful!',
-            text: `Welcome, ${res.data.name}`,
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          });
-          this.router.navigate(['/']);
+      title: 'Google Sign In',
+      text: 'Enter your Google Email Address:',
+      input: 'email',
+      inputPlaceholder: 'yourname@gmail.com',
+      showCancelButton: true,
+      confirmButtonText: 'Continue',
+      confirmButtonColor: '#10b981',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'You must enter a valid email!';
         }
-      },
-      error: () => {
-        // Registration failed, user likely already exists, try logging in
-        this.authService.login({ email: googlePayload.email, password: googlePayload.password }).subscribe({
-          next: (res) => {
-            Swal.close();
-            this.isLoading.set(false);
-            if (res.success) {
-              Swal.fire({
-                title: 'Google Welcome Back!',
-                text: `Logged in as ${res.data.name}`,
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-              });
-              this.router.navigate(['/']);
+        return null;
+      }
+    }).then((emailResult) => {
+      if (emailResult.isConfirmed && emailResult.value) {
+        const email = emailResult.value;
+        
+        Swal.fire({
+          title: 'Google Sign In',
+          text: 'Enter your Full Name:',
+          input: 'text',
+          inputPlaceholder: 'John Doe',
+          showCancelButton: true,
+          confirmButtonText: 'Login',
+          confirmButtonColor: '#10b981',
+          inputValidator: (value) => {
+            if (!value) {
+              return 'You must enter your name!';
             }
-          },
-          error: (err) => {
-            Swal.close();
-            this.isLoading.set(false);
+            return null;
+          }
+        }).then((nameResult) => {
+          if (nameResult.isConfirmed && nameResult.value) {
+            const name = nameResult.value;
+            
+            this.isLoading.set(true);
             Swal.fire({
-              title: 'Google Sign In Failed',
-              text: 'Unable to authenticate Google account.',
-              icon: 'error',
-              confirmButtonColor: '#10b981'
+              title: 'Connecting to Google...',
+              text: 'Authenticating your secure Google profile.',
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+
+            const googlePayload = {
+              name,
+              email,
+              password: 'google_oauth_secure_password_123_bypass'
+            };
+
+            this.authService.register(googlePayload).subscribe({
+              next: (res) => {
+                Swal.close();
+                this.isLoading.set(false);
+                if (res.success) {
+                  Swal.fire({
+                    title: 'Google Login Successful!',
+                    text: `Welcome, ${res.data.name}`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                  });
+                  this.router.navigate(['/']);
+                }
+              },
+              error: () => {
+                // User already registered, log in directly
+                this.authService.login({ email: googlePayload.email, password: googlePayload.password }).subscribe({
+                  next: (res) => {
+                    Swal.close();
+                    this.isLoading.set(false);
+                    if (res.success) {
+                      Swal.fire({
+                        title: 'Google Welcome Back!',
+                        text: `Logged in as ${res.data.name}`,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                      });
+                      this.router.navigate(['/']);
+                    }
+                  },
+                  error: () => {
+                    Swal.close();
+                    this.isLoading.set(false);
+                    Swal.fire({
+                      title: 'Google Sign In Failed',
+                      text: 'Unable to authenticate Google account.',
+                      icon: 'error',
+                      confirmButtonColor: '#ef4444'
+                    });
+                  }
+                });
+              }
             });
           }
         });

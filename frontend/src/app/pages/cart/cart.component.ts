@@ -26,15 +26,15 @@ export class CartComponent {
   }
 
   increaseQuantity(item: CartItem) {
-    this.cartService.updateQuantity(item.medicineId, item.quantity + 1);
+    this.cartService.updateQuantity(item.medicineId, item.pharmacyId, item.quantity + 1);
   }
 
   decreaseQuantity(item: CartItem) {
-    this.cartService.updateQuantity(item.medicineId, item.quantity - 1);
+    this.cartService.updateQuantity(item.medicineId, item.pharmacyId, item.quantity - 1);
   }
 
   removeItem(item: CartItem) {
-    this.cartService.removeFromCart(item.medicineId);
+    this.cartService.removeFromCart(item.medicineId, item.pharmacyId);
     Swal.fire({
       toast: true,
       position: 'top-end',

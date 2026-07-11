@@ -156,5 +156,56 @@
         </div>
       </div>
     </div>
+
+    <!-- Contact Queries Row -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card glass-card border-0 p-4 shadow-lg">
+          <h5 class="fw-bold text-dark mb-4 border-bottom pb-2 d-flex align-items-center gap-2">
+            <span class="material-icons text-teal" style="color: #10b981;">help_outline</span>
+            <span>User Health Queries & Contact Logs</span>
+          </h5>
+
+          @if (contacts().length === 0) {
+            <div class="text-center py-4 text-muted">
+              <span class="material-icons" style="font-size: 2.5rem;">mail</span>
+              <p class="small mt-2">No user query messages have been logged in the system yet.</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-borderless align-middle mb-0">
+                <thead>
+                  <tr class="border-bottom small text-secondary uppercase-label" style="font-size: 0.72rem;">
+                    <th scope="col">Date Submitted</th>
+                    <th scope="col">User Name / Email</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Message Query</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of contacts(); track c._id) {
+                    <tr class="border-bottom" style="border-color: #f1f5f9 !important;">
+                      <td class="py-3 small text-muted" style="font-size: 0.75rem;">
+                        {{ c.createdAt | date: 'medium' }}
+                      </td>
+                      <td class="py-3">
+                        <h6 class="fw-bold text-dark mb-0 small">{{ c.name }}</h6>
+                        <span class="text-muted" style="font-size: 0.72rem;">{{ c.email }}</span>
+                      </td>
+                      <td class="py-3 text-secondary small" style="font-size: 0.78rem;">
+                        {{ c.phone || 'N/A' }}
+                      </td>
+                      <td class="py-3 text-dark small" style="max-width: 300px; word-wrap: break-word; white-space: normal; font-size: 0.82rem;">
+                        {{ c.message }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
   }
 </div>
