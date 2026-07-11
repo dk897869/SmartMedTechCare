@@ -1,0 +1,132 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-dark mb-1">Shopping Cart</h1>
+      <p class="text-muted">Review your selected medicines and adjust quantities before payment.</p>
+    </div>
+  </div>
+
+  @if (items().length === 0) {
+    <!-- Empty State -->
+    <div class="card glass-card border-0 p-5 text-center shadow d-flex flex-column align-items-center justify-content-center" style="min-height: 350px;">
+      <span class="material-icons text-muted" style="font-size: 4.5rem; color: #cbd5e1;">remove_shopping_cart</span>
+      <h4 class="fw-bold text-dark mt-3">Your Cart is Empty</h4>
+      <p class="text-muted small mb-4" style="max-width: 320px;">You haven't added any medicines to your cart yet. Explore our medicine comparison grid to find the best deal.</p>
+      <a routerLink="/medicines" class="btn btn-premium px-4 py-3" style="border-radius: 12px; font-weight: 500;">
+        Search Medicines Catalog
+      </a>
+    </div>
+  } @else {
+    <!-- Cart Items Grid -->
+    <div class="row g-4">
+      <!-- Items List -->
+      <div class="col-lg-8">
+        <div class="card glass-card border-0 p-4 shadow">
+          <div class="table-responsive">
+            <table class="table table-borderless align-middle mb-0">
+              <thead>
+                <tr class="border-bottom text-secondary small uppercase-label" style="font-size: 0.75rem;">
+                  <th scope="col" style="padding-bottom: 12px;">Product Details</th>
+                  <th scope="col" class="text-center" style="padding-bottom: 12px;">Quantity</th>
+                  <th scope="col" class="text-end" style="padding-bottom: 12px;">Price</th>
+                  <th scope="col" style="padding-bottom: 12px;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of items(); track item.medicineId) {
+                  <tr class="border-bottom" style="border-color: #f1f5f9 !important;">
+                    <td class="py-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <img [src]="item.image" class="rounded object-fit-cover shadow-sm" alt="Medicine" style="width: 50px; height: 50px;">
+                        <div>
+                          <h6 class="fw-bold text-dark mb-0">{{ item.name }}</h6>
+                          <p class="small text-muted mb-0">{{ item.brand }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-center">
+                      <div class="d-inline-flex align-items-center border rounded-3 bg-light overflow-hidden">
+                        <button type="button" class="btn btn-sm btn-light px-2 border-0" (click)="decreaseQuantity(item)" style="border-radius: 0;">
+                          <span class="material-icons" style="font-size: 1rem; vertical-align: middle;">remove</span>
+                        </button>
+                        <span class="px-3 fw-bold text-dark small">{{ item.quantity }}</span>
+                        <button type="button" class="btn btn-sm btn-light px-2 border-0" (click)="increaseQuantity(item)" style="border-radius: 0;">
+                          <span class="material-icons" style="font-size: 1rem; vertical-align: middle;">add</span>
+                        </button>
+                      </div>
+                    </td>
+                    <td class="py-3 text-end fw-bold text-teal" style="color: #0d9488;">
+                      ₹{{ (item.price * item.quantity).toFixed(2) }}
+                    </td>
+                    <td class="py-3 text-end">
+                      <button type="button" class="btn btn-link text-danger p-0" (click)="removeItem(item)" style="text-decoration: none;">
+                        <span class="material-icons" style="font-size: 1.25rem;">delete_outline</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Summary Panel -->
+      <div class="col-lg-4">
+        <div class="card glass-card border-0 p-4 shadow h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Order Summary</h5>
+            
+            <!-- Active Pharmacy Details -->
+            <div class="p-3 border rounded-3 mb-4" style="background-color: #f8fafc; border-radius: 10px;">
+              <p class="small text-muted mb-1 d-flex align-items-center gap-1">
+                <span class="material-icons text-teal" style="font-size: 1rem; color: #0d9488;">local_pharmacy</span>
+                <span>Dispensing Pharmacy:</span>
+              </p>
+              <h6 class="fw-bold text-dark mb-0">{{ selectedPharmacy()?.name }}</h6>
+              <p class="small text-muted mb-0">{{ selectedPharmacy()?.address }}</p>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="d-flex flex-column gap-2 border-bottom pb-3 mb-3 small">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Subtotal</span>
+                <span class="fw-semibold text-dark">₹{{ cartSubtotal().toFixed(2) }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Delivery Charges</span>
+                @if (getDeliveryFee() === 0) {
+                  <span class="text-success fw-bold">FREE</span>
+                } @else {
+                  <span class="fw-semibold text-dark">₹{{ getDeliveryFee().toFixed(2) }}</span>
+                }
+              </div>
+            </div>
+
+            <!-- Total Price -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <span class="fw-bold text-dark">Total Amount</span>
+              <h3 class="fw-bold text-teal mb-0" style="color: #0d9488;">₹{{ getTotal().toFixed(2) }}</h3>
+            </div>
+
+            <!-- Promo/Discount Notification -->
+            @if (cartSubtotal() < 500) {
+              <div class="alert alert-info border-0 p-2 mb-4 text-center small text-muted" style="background-color: #f0fdf4; color: #15803d; border-radius: 8px;">
+                💡 Add <strong>₹{{ (500 - cartSubtotal()).toFixed(2) }}</strong> more to get <strong>FREE</strong> delivery!
+              </div>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+            (click)="proceedToCheckout()"
+          >
+            <span class="material-icons">shopping_bag</span>
+            <span>Proceed to Checkout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

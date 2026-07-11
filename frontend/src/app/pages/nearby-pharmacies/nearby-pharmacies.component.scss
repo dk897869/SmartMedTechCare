@@ -1,0 +1,30 @@
+/* Nearby pharmacies specific style rules */
+.select-hover-card:hover {
+  border-color: #0d9488 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.bg-teal-soft {
+  background-color: rgba(20, 184, 166, 0.1);
+  color: #14b8a6;
+}
+.bg-info {
+  background-color: #0ea5e9 !important;
+}
+.border-teal {
+  border-color: #14b8a6 !important;
+}
+.pulse-animation {
+  animation: pulse-ring 1.8s infinite ease-in-out;
+  transform-origin: center;
+}
+@keyframes pulse-ring {
+  0% {
+    r: 4px;
+    opacity: 0.8;
+  }
+  100% {
+    r: 14px;
+    opacity: 0;
+  }
+}

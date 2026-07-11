@@ -1,0 +1,310 @@
+@use '@angular/material' as mat;
+
+/* Import Bootstrap CSS */
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Outfit,
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: #fcfdfd;
+  color: #1e293b; /* Slate-800 */
+  font-family: 'Outfit', sans-serif;
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Premium Styles & Design tokens (Light Theme matching Docus.ai) */
+:root {
+  --primary-brand: #10b981; /* Emerald Green */
+  --secondary-brand: #0f766e; /* Teal */
+  --coral-btn: #f05252; /* Coral Red for "Get Started" */
+  --coral-hover: #e02424;
+  --text-dark: #0f172a;
+  --text-slate: #475569;
+  --text-light-grey: #64748b;
+  --border-grey: #e2e8f0;
+}
+
+/* Page animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Curated Card Components */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--border-grey);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+/* Inputs styling */
+.glass-input {
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  color: var(--text-dark) !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  font-size: 0.95rem !important;
+}
+
+.glass-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.glass-input:focus {
+  background: #ffffff !important;
+  border-color: var(--primary-brand) !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12) !important;
+}
+
+/* Premium Buttons */
+.btn-premium {
+  background: var(--coral-btn);
+  color: white !important;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 28px;
+  letter-spacing: 0.2px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(240, 82, 82, 0.2);
+  cursor: pointer;
+}
+
+.btn-premium:hover {
+  background: var(--coral-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(240, 82, 82, 0.35);
+}
+
+.btn-teal-premium {
+  background: var(--primary-brand);
+  color: white !important;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 28px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  cursor: pointer;
+}
+
+.btn-teal-premium:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+}
+
+.btn-outline-teal {
+  border: 1.5px solid var(--primary-brand) !important;
+  color: var(--primary-brand) !important;
+  background: transparent;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.25s;
+}
+
+.btn-outline-teal:hover {
+  background: rgba(16, 185, 129, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* Text Overrides */
+.text-teal {
+  color: var(--primary-brand) !important;
+}
+
+.text-secondary-teal {
+  color: var(--secondary-brand) !important;
+}
+
+.text-dark {
+  color: var(--text-dark) !important;
+}
+
+.text-muted {
+  color: var(--text-slate) !important;
+}
+
+/* Custom Checklist Items */
+.docus-check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-slate);
+  margin-bottom: 12px;
+}
+
+.docus-check-icon {
+  color: var(--primary-brand);
+  font-weight: bold;
+}
+
+/* Smartphone Mockup CSS Frame (Saves image dependecies) */
+.phone-mockup {
+  width: 320px;
+  height: 600px;
+  border: 12px solid #0f172a;
+  border-radius: 40px;
+  background: #f8fafc;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25);
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-notch {
+  width: 140px;
+  height: 24px;
+  background: #0f172a;
+  border-radius: 0 0 16px 16px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.phone-screen {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 16px 16px 16px;
+  font-size: 0.85rem;
+}
+
+/* Chat bubble styling inside phone mockup */
+.chat-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.chat-bot {
+  background: #0f766e;
+  color: white;
+  border-top-left-radius: 4px;
+  align-self: flex-start;
+}
+
+.chat-user {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-top-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.phone-keyboard {
+  background: #e2e8f0;
+  padding: 8px;
+  border-top: 1px solid #cbd5e1;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.key {
+  background: white;
+  padding: 6px;
+  border-radius: 4px;
+  flex-grow: 1;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: bold;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  color: #334155;
+}
+
+/* Google Sign-In Button */
+.btn-google {
+  background: #ffffff;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-weight: 500;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-google:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.btn-google img {
+  width: 18px;
+  height: 18px;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

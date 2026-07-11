@@ -1,0 +1,154 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h1 class="fw-bold text-dark mb-2">Nearby Partner Pharmacies</h1>
+      <p class="text-muted">Explore regional pharmacy listings near your GPS location and check their distance.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Pharmacy List -->
+    <div class="col-lg-5">
+      <div class="card glass-card border-0 p-4 shadow mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-teal" style="color: #0d9488;">📍 Store Listings</h5>
+          <button class="btn btn-light btn-sm border d-flex align-items-center gap-1" (click)="detectAndFetch()">
+            <span class="material-icons" style="font-size: 1rem;">my_location</span>
+            <span>Refresh GPS</span>
+          </button>
+        </div>
+
+        <div class="alert alert-secondary p-2 mb-3 border bg-white" style="border-radius: 8px;">
+          <p class="small text-muted mb-0 d-flex align-items-center gap-1">
+            <span class="material-icons text-teal" style="font-size: 1rem; color: #0d9488;">location_on</span>
+            <span><strong>Live GPS:</strong> Lat: {{ userCoords().lat.toFixed(4) }}, Lng: {{ userCoords().lng.toFixed(4) }} ({{ userCoords().address }})</span>
+          </p>
+        </div>
+
+        @if (isLoading()) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-teal" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2 small">Locating stores...</p>
+          </div>
+        } @else {
+          @if (pharmacies().length === 0) {
+            <div class="alert alert-warning text-center small py-4">
+              ⚠️ No partner pharmacies found within 15 km of your location. Try reloading GPS.
+            </div>
+          } @else {
+            <div class="d-flex flex-column gap-3" style="max-height: 480px; overflow-y: auto; padding-right: 4px;">
+              @for (ph of pharmacies(); track ph._id) {
+                <div
+                  class="card p-3 border cursor-pointer select-hover-card"
+                  [class.border-teal]="selectedPharmacy()?._id === ph._id"
+                  [style.background]="selectedPharmacy()?._id === ph._id ? '#f0fdfa' : 'white'"
+                  style="border-radius: 12px; transition: all 0.2s;"
+                  (click)="selectPharmacy(ph)"
+                >
+                  <div class="d-flex justify-content-between align-items-start mb-1">
+                    <h6 class="fw-bold text-dark mb-0">{{ ph.name }}</h6>
+                    <span class="badge bg-teal-soft text-teal font-semibold small" style="background-color: #e6fbf7; color: #0d9488;">
+                      {{ ph.distance }} km away
+                    </span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="text-warning small">⭐ {{ ph.rating }} Rating</span>
+                    <span class="text-muted small">&bull; {{ ph.contact }}</span>
+                  </div>
+                  <p class="small text-muted mb-2">{{ ph.address }}</p>
+                  
+                  <div class="d-flex gap-2">
+                    <a routerLink="/medicines" class="btn btn-outline-teal btn-sm px-3 flex-grow-1" style="border-color: #0d9488; color: #0d9488; font-size: 0.8rem; border-radius: 8px;">
+                      View Store Stock
+                    </a>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Styled Mock Map (SVG/HTML Canvas) -->
+    <div class="col-lg-7">
+      <div class="card glass-card border-0 p-4 shadow-lg text-center h-100 d-flex flex-column" style="min-height: 400px;">
+        <h5 class="fw-bold text-dark mb-3 text-start d-flex align-items-center gap-2">
+          <span class="material-icons text-teal" style="color: #0d9488;">map</span>
+          <span>Interactive Radar Map View</span>
+        </h5>
+
+        <div class="flex-grow-1 border rounded-4 position-relative overflow-hidden" style="background-color: #0f172a; min-height: 380px;">
+          <!-- Custom SVG grid and nodes mapping -->
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; top:0; left:0;">
+            <!-- Background Roads Grid representation -->
+            <line x1="0" y1="20" x2="100" y2="20" stroke="#334155" stroke-width="0.75" />
+            <line x1="0" y1="50" x2="100" y2="50" stroke="#334155" stroke-width="0.75" />
+            <line x1="0" y1="80" x2="100" y2="80" stroke="#334155" stroke-width="0.75" />
+            <line x1="30" y1="0" x2="30" y2="100" stroke="#334155" stroke-width="0.75" />
+            <line x1="70" y1="0" x2="70" y2="100" stroke="#334155" stroke-width="0.75" />
+
+            <!-- User GPS Position Node -->
+            @if (userCoords()) {
+              <!-- Glowing circle halos -->
+              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="8" fill="#0ea5e9" opacity="0.2" class="pulse-animation" />
+              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="4" fill="#0ea5e9" opacity="0.4" />
+              <circle [attr.cx]="getSvgCoords(userCoords().lat, userCoords().lng).x" [attr.cy]="getSvgCoords(userCoords().lat, userCoords().lng).y" r="2" fill="#ffffff" />
+            }
+
+            <!-- Pharmacy pins -->
+            @for (p of pharmacies(); track p._id) {
+              <!-- Draw lines connect user to active selection store -->
+              @if (selectedPharmacy()?._id === p._id) {
+                <line
+                  [attr.x1]="getSvgCoords(userCoords().lat, userCoords().lng).x"
+                  [attr.y1]="getSvgCoords(userCoords().lat, userCoords().lng).y"
+                  [attr.x2]="getSvgCoords(p.location.lat, p.location.lng).x"
+                  [attr.y2]="getSvgCoords(p.location.lat, p.location.lng).y"
+                  stroke="#14b8a6"
+                  stroke-width="0.5"
+                  stroke-dasharray="2,2"
+                />
+              }
+
+              <!-- Pharmacy Node Circle pin -->
+              <circle
+                [attr.cx]="getSvgCoords(p.location.lat, p.location.lng).x"
+                [attr.cy]="getSvgCoords(p.location.lat, p.location.lng).y"
+                [attr.r]="selectedPharmacy()?._id === p._id ? 4 : 3"
+                [attr.fill]="selectedPharmacy()?._id === p._id ? '#14b8a6' : '#94a3b8'"
+                [attr.stroke]="selectedPharmacy()?._id === p._id ? '#ffffff' : 'none'"
+                stroke-width="0.5"
+                (click)="selectPharmacy(p)"
+                style="cursor: pointer; transition: all 0.2s;"
+              />
+            }
+          </svg>
+
+          <!-- Label Overlays on screen -->
+          <div class="position-absolute p-2 bg-dark rounded border border-secondary small text-start" style="top: 12px; left: 12px; opacity: 0.85; background: #1e293b !important; color: #cbd5e1; border-color: #475569 !important;">
+            <div class="d-flex align-items-center gap-1"><span class="badge bg-info" style="width: 10px; height: 10px; padding: 0; border-radius: 50%;"></span> <span>User Location</span></div>
+            <div class="d-flex align-items-center gap-1 mt-1"><span class="badge bg-teal" style="width: 10px; height: 10px; padding: 0; border-radius: 50%; background-color: #14b8a6;"></span> <span>Pharmacy Partner</span></div>
+          </div>
+
+          <!-- Active Selection Summary overlay -->
+          @if (selectedPharmacy()) {
+            <div class="position-absolute p-3 bg-dark rounded-4 shadow-lg border border-secondary text-start animate-fade-in-up" style="bottom: 12px; left: 12px; right: 12px; opacity: 0.95; background: #1e293b !important; border-color: #475569 !important; color: #f8fafc;">
+              <h6 class="fw-bold mb-0 text-teal d-flex align-items-center gap-1" style="color: #2dd4bf;">
+                <span class="material-icons" style="font-size: 1.1rem;">local_hospital</span>
+                <span>{{ selectedPharmacy()?.name }}</span>
+              </h6>
+              <p class="small text-muted mb-2">{{ selectedPharmacy()?.address }}</p>
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top border-secondary">
+                <span class="small">📏 Distance: <strong>{{ selectedPharmacy()?.distance }} km</strong></span>
+                <span class="small">⭐ Rating: <strong>{{ selectedPharmacy()?.rating }} / 5.0</strong></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

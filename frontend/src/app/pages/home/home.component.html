@@ -1,0 +1,142 @@
+<div class="container py-5 animate-fade-in-up" style="max-width: 1140px;">
+  <!-- Main Hero Block (Image 1 replica) -->
+  <div class="row align-items-center mb-5 g-5">
+    <!-- Left Column: Copy & Checklist -->
+    <div class="col-lg-6">
+      <h1 class="fw-bold mb-1" style="font-size: 3.5rem; color: #1e293b; letter-spacing: -1px;">
+        Symptom Checker
+      </h1>
+      <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #10b981; margin-top: -10px;">
+        powered by AI
+      </h2>
+      
+      <p class="text-secondary mb-4" style="font-size: 1.15rem; line-height: 1.6; max-width: 500px;">
+        Just 3 simple steps to efficiently understand and manage your health online with SmartMed AI Symptom Checker:
+      </p>
+
+      <!-- Checklist Grid (matching Image 1 check icons) -->
+      <div class="mb-4">
+        <div class="docus-check-item">
+          <span class="material-icons docus-check-icon">done</span>
+          <span>Describe your symptoms</span>
+        </div>
+        <div class="docus-check-item">
+          <span class="material-icons docus-check-icon">done</span>
+          <span>Answer targeted questions</span>
+        </div>
+        <div class="docus-check-item">
+          <span class="material-icons docus-check-icon">done</span>
+          <span>Receive instant health insights</span>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-3 mt-4">
+        <a routerLink="/symptoms" class="btn btn-premium px-4 py-3 d-flex align-items-center gap-2" style="border-radius: 12px; font-size: 1.05rem;">
+          <span>Start Symptom Checker</span>
+          <span class="material-icons">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Smartphone Interactive Mockup (Image 1 visual) -->
+    <div class="col-lg-6">
+      <div class="phone-mockup">
+        <!-- Notch -->
+        <div class="phone-notch"></div>
+        
+        <!-- Screen container -->
+        <div class="phone-screen">
+          <!-- Bot speech bubble -->
+          <div class="chat-bubble chat-bot">
+            Hi! I'm SmartMed AI Symptom Checker. <strong>How can I help?</strong>
+          </div>
+          
+          <!-- User response bubble -->
+          <div class="chat-bubble chat-user">
+            I have unexplained weight loss and skin changes.
+          </div>
+
+          <!-- Bot follow-up bubble -->
+          <div class="chat-bubble chat-bot" style="animation-delay: 0.8s;">
+            I can help analyze that. Have you experienced any other symptoms, such as increased thirst, fatigue, or dry skin?
+          </div>
+
+          <!-- Flexible spacer to push keyboard to bottom -->
+          <div class="flex-grow-1"></div>
+
+          <!-- Simulated Keyboard -->
+          <div class="phone-keyboard rounded-3">
+            <div class="keyboard-row">
+              <span class="key">Q</span><span class="key">W</span><span class="key">E</span><span class="key">R</span><span class="key">T</span>
+              <span class="key">Y</span><span class="key">U</span><span class="key">I</span><span class="key">O</span><span class="key">P</span>
+            </div>
+            <div class="keyboard-row">
+              <span class="key">A</span><span class="key">S</span><span class="key">D</span><span class="key">F</span><span class="key">G</span>
+              <span class="key">H</span><span class="key">J</span><span class="key">K</span><span class="key">L</span>
+            </div>
+            <div class="keyboard-row">
+              <span class="key">Z</span><span class="key">X</span><span class="key">C</span><span class="key">V</span><span class="key">B</span>
+              <span class="key">N</span><span class="key">M</span>
+            </div>
+            <div class="keyboard-row">
+              <span class="key" style="flex-grow: 2;">123</span>
+              <span class="key" style="flex-grow: 6; background: #fff;">space</span>
+              <span class="key" style="flex-grow: 2; background: #cbd5e1;">Enter</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing, Nearby & Reminders promo grids -->
+  <div class="row g-4 mt-5 pt-4">
+    <div class="col-md-4">
+      <div class="card glass-card h-100 p-4 border-0 text-center text-md-start">
+        <div class="d-inline-flex rounded-3 p-3 bg-light mb-3 text-teal">
+          <span class="material-icons" style="font-size: 2.2rem;">currency_exchange</span>
+        </div>
+        <h4 class="fw-bold text-dark">Price Comparison</h4>
+        <p class="text-secondary small">
+          Locate your medicines and instantly compare prices between local pharmacies. Save money on every transaction.
+        </p>
+        <a routerLink="/medicines" class="text-teal fw-bold d-inline-flex align-items-center gap-1 mt-2" style="text-decoration: none;">
+          <span>Compare Costs</span>
+          <span class="material-icons" style="font-size: 1rem;">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card glass-card h-100 p-4 border-0 text-center text-md-start">
+        <div class="d-inline-flex rounded-3 p-3 bg-light mb-3 text-teal">
+          <span class="material-icons" style="font-size: 2.2rem;">my_location</span>
+        </div>
+        <h4 class="fw-bold text-dark">Proximity Maps</h4>
+        <p class="text-secondary small">
+          Use geolocation to detect stores near you. Compare walking distances, ratings, and order details.
+        </p>
+        <a routerLink="/pharmacies" class="text-teal fw-bold d-inline-flex align-items-center gap-1 mt-2" style="text-decoration: none;">
+          <span>Locate Stores</span>
+          <span class="material-icons" style="font-size: 1rem;">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card glass-card h-100 p-4 border-0 text-center text-md-start">
+        <div class="d-inline-flex rounded-3 p-3 bg-light mb-3 text-teal">
+          <span class="material-icons" style="font-size: 2.2rem;">alarm</span>
+        </div>
+        <h4 class="fw-bold text-dark">Pill Reminders</h4>
+        <p class="text-secondary small">
+          Configure local alarms to get alert warnings for your medication cycles. Track blood logs and bio health history.
+        </p>
+        <a routerLink="/profile" class="text-teal fw-bold d-inline-flex align-items-center gap-1 mt-2" style="text-decoration: none;">
+          <span>Set Reminders</span>
+          <span class="material-icons" style="font-size: 1rem;">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

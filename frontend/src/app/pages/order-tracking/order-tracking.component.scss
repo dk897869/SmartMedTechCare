@@ -1,0 +1,28 @@
+/* Order tracking specific style rules */
+.bg-teal-soft {
+  background-color: rgba(20, 184, 166, 0.1);
+  color: #14b8a6;
+}
+.pulse-animation {
+  animation: pulse-marker 1.6s infinite ease-in-out;
+  transform-origin: center;
+}
+@keyframes pulse-marker {
+  0% {
+    r: 4px;
+    opacity: 0.8;
+  }
+  100% {
+    r: 12px;
+    opacity: 0;
+  }
+}
+.uppercase-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  display: block;
+}
+.border-bottom {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+}

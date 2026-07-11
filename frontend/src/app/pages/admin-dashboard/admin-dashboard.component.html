@@ -1,0 +1,160 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-dark mb-1">Pharmacist & Admin Portal</h1>
+      <p class="text-muted">Adjust regional medicine prices, view order statistics, and dispatch delivery partners.</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-teal" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-2 small">Connecting to administration nodes...</p>
+    </div>
+  } @else {
+    <!-- Stats Row -->
+    <div class="row g-4 mb-5 text-center">
+      <div class="col-md-3 col-sm-6">
+        <div class="card glass-card border-0 p-3 shadow-sm">
+          <span class="text-muted small uppercase-label">Gross Revenue</span>
+          <h3 class="fw-bold text-teal mb-0" style="color: #0d9488;">₹{{ stats()?.counts?.revenue }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card glass-card border-0 p-3 shadow-sm">
+          <span class="text-muted small uppercase-label">Orders Placed</span>
+          <h3 class="fw-bold text-dark mb-0">{{ stats()?.counts?.orders }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card glass-card border-0 p-3 shadow-sm">
+          <span class="text-muted small uppercase-label">Store Partners</span>
+          <h3 class="fw-bold text-sky mb-0" style="color: #0284c7;">{{ stats()?.counts?.pharmacies }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card glass-card border-0 p-3 shadow-sm">
+          <span class="text-muted small uppercase-label">Patient Registrations</span>
+          <h3 class="fw-bold text-indigo mb-0" style="color: #4f46e5;">{{ stats()?.counts?.users }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column: Inventory Price & Stock Modifier -->
+      <div class="col-lg-5">
+        <div class="card glass-card border-0 p-4 shadow mb-4">
+          <h5 class="fw-bold text-dark mb-4 border-bottom pb-2 d-flex align-items-center gap-2">
+            <span class="material-icons text-teal" style="color: #0d9488;">edit_note</span>
+            <span>Update Store Inventory</span>
+          </h5>
+
+          <form (ngSubmit)="submitInventoryUpdate()" #inventoryForm="ngForm">
+            <!-- Pharmacy Selection -->
+            <div class="mb-3">
+              <label for="pharmacySelect" class="form-label text-secondary small fw-semibold">dispensing Pharmacy</label>
+              <select id="pharmacySelect" name="pharmacyId" class="form-select glass-input w-100" [(ngModel)]="selectedPharmacyId" required>
+                <option value="">Select Pharmacy</option>
+                @for (ph of pharmacies(); track ph._id) {
+                  <option [value]="ph._id">{{ ph.name }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Medicine Selection -->
+            <div class="mb-3">
+              <label for="medicineSelect" class="form-label text-secondary small fw-semibold">Select Medicine</label>
+              <select id="medicineSelect" name="medicineId" class="form-select glass-input w-100" [(ngModel)]="selectedMedicineId" required>
+                <option value="">Select Medicine</option>
+                @for (med of medicines(); track med._id) {
+                  <option [value]="med._id">{{ med.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <!-- Price Input -->
+              <div class="col-6">
+                <label for="priceInput" class="form-label text-secondary small fw-semibold">Unit Price (₹)</label>
+                <input type="number" id="priceInput" name="price" class="form-control glass-input w-100" min="0" step="0.1" [(ngModel)]="priceUpdate" required />
+              </div>
+
+              <!-- Stock Input -->
+              <div class="col-6">
+                <label for="stockInput" class="form-label text-secondary small fw-semibold">In-Stock Quantity</label>
+                <input type="number" id="stockInput" name="stock" class="form-control glass-input w-100" min="0" [(ngModel)]="stockUpdate" required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+              <span class="material-icons">inventory</span>
+              <span>Save Inventory Log</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: System Orders management -->
+      <div class="col-lg-7">
+        <div class="card glass-card border-0 p-4 shadow-lg">
+          <h5 class="fw-bold text-dark mb-4 border-bottom pb-2 d-flex align-items-center gap-2">
+            <span class="material-icons text-teal" style="color: #0d9488;">receipt_long</span>
+            <span>All System Orders</span>
+          </h5>
+
+          @if (orders().length === 0) {
+            <div class="text-center py-4 text-muted">
+              <span class="material-icons" style="font-size: 2.5rem;">receipt</span>
+              <p class="small mt-2">No user orders have been registered in the system yet.</p>
+            </div>
+          } @else {
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table table-borderless align-middle mb-0">
+                <thead>
+                  <tr class="border-bottom small text-secondary uppercase-label" style="font-size: 0.72rem;">
+                    <th scope="col">Order Ref / Date</th>
+                    <th scope="col">Customer / Store</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Status Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (order of orders(); track order._id) {
+                    <tr class="border-bottom" style="border-color: #f1f5f9 !important;">
+                      <td class="py-3">
+                        <h6 class="fw-bold text-dark mb-0" style="font-family: monospace; font-size: 0.85rem;">{{ order._id.substring(0, 8) }}...</h6>
+                        <span class="text-muted small" style="font-size: 0.7rem;">{{ order.createdAt | date: 'shortDate' }}</span>
+                      </td>
+                      <td class="py-3">
+                        <h6 class="fw-bold text-dark mb-0 small">{{ order.userId?.name }}</h6>
+                        <span class="text-muted small" style="font-size: 0.72rem;">🏪 {{ order.pharmacyId?.name }}</span>
+                      </td>
+                      <td class="py-3 text-teal fw-bold" style="color: #0d9488;">
+                        ₹{{ order.totalAmount.toFixed(2) }}
+                      </td>
+                      <td class="py-3">
+                        <div class="dropdown">
+                          <button class="btn btn-sm btn-light border dropdown-toggle fw-semibold" type="button" [id]="'statusBtn_' + order._id" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.8rem; border-radius: 8px;">
+                            {{ order.status }}
+                          </button>
+                          <ul class="dropdown-menu shadow border-0" [attr.aria-labelledby]="'statusBtn_' + order._id" style="font-size: 0.85rem; border-radius: 8px;">
+                            <li><button class="dropdown-item py-2" (click)="updateOrderStatus(order._id, 'Processing')">⚙️ Processing</button></li>
+                            <li><button class="dropdown-item py-2" (click)="updateOrderStatus(order._id, 'Shipped')">🏍️ Shipped</button></li>
+                            <li><button class="dropdown-item py-2" (click)="updateOrderStatus(order._id, 'Delivered')">✅ Delivered</button></li>
+                            <li><button class="dropdown-item py-2 text-danger" (click)="updateOrderStatus(order._id, 'Cancelled')">❌ Cancelled</button></li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

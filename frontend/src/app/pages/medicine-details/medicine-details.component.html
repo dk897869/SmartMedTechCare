@@ -1,0 +1,152 @@
+<div class="container py-5 animate-fade-in-up">
+  <!-- Back button -->
+  <div class="mb-4">
+    <a routerLink="/medicines" class="btn btn-light d-inline-flex align-items-center gap-1 border" style="border-radius: 20px;">
+      <span class="material-icons" style="font-size: 1.1rem;">arrow_back</span>
+      <span>Back to Comparison</span>
+    </a>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-teal" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-2 small">Loading details...</p>
+    </div>
+  } @else {
+    @if (medicine()) {
+      <div class="row g-4 mb-5">
+        <!-- Medicine Card Header -->
+        <div class="col-md-4">
+          <div class="card glass-card border-0 p-3 shadow-lg text-center">
+            <img [src]="medicine()?.image" class="img-fluid rounded-4 object-fit-cover shadow-sm mb-3" alt="Medicine" style="width: 100%; max-height: 250px;">
+            <h3 class="fw-bold text-dark mb-1">{{ medicine()?.name }}</h3>
+            <p class="text-muted mb-3">{{ medicine()?.brand }} &bull; {{ medicine()?.category }}</p>
+            @if (medicine()?.requiresPrescription) {
+              <span class="badge bg-danger px-3 py-2 badge-pill mx-auto mb-2" style="max-width: 160px; font-size: 0.8rem;">PRESCRIPTION REQUIRED</span>
+            } @else {
+              <span class="badge bg-success px-3 py-2 badge-pill mx-auto mb-2" style="max-width: 160px; font-size: 0.8rem; background-color: #d1fae5; color: #065f46;">OTC MEDICINE</span>
+            }
+          </div>
+        </div>
+
+        <!-- Medicine Clinical Data -->
+        <div class="col-md-8">
+          <div class="card glass-card border-0 p-4 shadow-lg h-100">
+            <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Clinical Specifications</h4>
+            
+            <div class="mb-4">
+              <h6 class="fw-bold text-secondary uppercase-label small">Product Description</h6>
+              <p style="line-height: 1.6;">{{ medicine()?.description }}</p>
+            </div>
+
+            <!-- Active Ingredients -->
+            <div class="mb-4">
+              <h6 class="fw-bold text-secondary uppercase-label small">Active Ingredients</h6>
+              <div class="d-flex flex-wrap gap-2">
+                @for (ing of medicine()?.activeIngredients; track ing) {
+                  <span class="badge bg-teal-soft text-teal px-3 py-2 fw-medium" style="background-color: #e6fbf7; color: #0d9488; font-size: 0.85rem; border-radius: 8px;">
+                    {{ ing }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Dosage Guidance -->
+            <div class="mb-4">
+              <h6 class="fw-bold text-secondary uppercase-label small">Dosage Guidance</h6>
+              <div class="p-3 border rounded-3 bg-light" style="border-radius: 8px; border-left: 4px solid #0284c7 !important;">
+                <p class="mb-0 small" style="line-height: 1.6;">{{ medicine()?.dosageGuidance }}</p>
+              </div>
+            </div>
+
+            <!-- Side Effects -->
+            <div class="mb-0">
+              <h6 class="fw-bold text-secondary uppercase-label small">Possible Side Effects</h6>
+              <ul class="mb-0 ps-3">
+                @for (side of medicine()?.sideEffects; track side) {
+                  <li class="small mb-1 text-muted">{{ side }}</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing listings from stores -->
+      <div class="card glass-card border-0 p-4 shadow-lg mb-4 animate-fade-in-up">
+        <h4 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+          <span class="material-icons text-teal" style="color: #0d9488;">local_pharmacy</span>
+          <span>Available Pricing across Partner Pharmacies</span>
+        </h4>
+
+        @if (isLoadingPrices()) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-teal" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2 small">Loading price sheets...</p>
+          </div>
+        } @else {
+          @if (listings().length === 0) {
+            <div class="alert alert-secondary text-center small py-4">
+              ⚠️ No partner pharmacies have active stock logs for this medicine.
+            </div>
+          } @else {
+            <div class="row g-3">
+              @for (listing of listings(); track listing._id) {
+                <div class="col-md-6 col-lg-4">
+                  <div class="card p-3 border h-100 d-flex flex-column justify-content-between" style="border-radius: 12px; background: rgba(255,255,255,0.65);">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold text-dark mb-0">{{ listing.pharmacyId.name }}</h6>
+                        <span class="badge bg-warning-soft text-warning fw-semibold small" style="background-color: #fef3c7; color: #d97706;">⭐ {{ listing.pharmacyId.rating }}</span>
+                      </div>
+                      <p class="small text-muted mb-2">{{ listing.pharmacyId.address }}</p>
+                      
+                      <div class="d-flex align-items-baseline gap-2 mt-2">
+                        <h3 class="fw-bold text-teal mb-0" style="color: #0d9488;">₹{{ listing.price.toFixed(2) }}</h3>
+                        @if (listing.stock > 0) {
+                          <span class="text-success small fw-semibold">In Stock ({{ listing.stock }} left)</span>
+                        } @else {
+                          <span class="text-danger small fw-semibold">Out of Stock</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="mt-3 pt-2 border-top">
+                      <button
+                        type="button"
+                        class="btn btn-premium w-100 d-flex align-items-center justify-content-center gap-1"
+                        (click)="addToCart(listing)"
+                        [disabled]="listing.stock <= 0"
+                        style="padding: 10px;"
+                      >
+                        <span class="material-icons" style="font-size: 1.1rem;">shopping_basket</span>
+                        <span>Add from this Store</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Prescriptions Warning Banner -->
+      @if (medicine()?.requiresPrescription) {
+        <div class="alert alert-danger border-0 p-3 bg-light-danger mb-0" style="background-color: #fef2f2; border-left: 4px solid #ef4444 !important; color: #b91c1c; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;">
+          <strong>⚠️ Prescription Validation Required:</strong> This is a prescription-only drug. You will be required to upload a valid medical prescription image at checkout to finalize your order. Our pharmacists will inspect and approve the prescription before delivery.
+        </div>
+      }
+    } @else {
+      <div class="card p-5 text-center text-muted">
+        <span class="material-icons text-muted" style="font-size: 3rem;">sentiment_dissatisfied</span>
+        <h5 class="fw-bold text-dark mt-2">Product Not Found</h5>
+        <p class="small">The medicine details you requested could not be retrieved from the catalog.</p>
+      </div>
+    }
+  }
+</div>

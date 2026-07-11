@@ -1,0 +1,20 @@
+/* Checkout specific styles rules */
+.bg-teal-soft {
+  background-color: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+}
+.bg-danger-soft {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.border-teal {
+  border-color: #0d9488 !important;
+}
+.uppercase-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.border-dashed {
+  border-style: dashed !important;
+}

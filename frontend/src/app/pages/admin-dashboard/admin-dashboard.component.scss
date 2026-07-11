@@ -1,0 +1,22 @@
+/* Admin dashboard specific stylesheet rules */
+.uppercase-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  display: block;
+}
+.border-bottom {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+.bg-teal-soft {
+  background-color: rgba(20, 184, 166, 0.1);
+  color: #14b8a6;
+}
+.bg-sky-soft {
+  background-color: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+}
+.bg-indigo-soft {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}

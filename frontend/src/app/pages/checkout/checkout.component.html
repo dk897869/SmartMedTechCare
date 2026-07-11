@@ -1,0 +1,225 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-dark mb-1">Secure Checkout</h1>
+      <p class="text-muted">Fill in your delivery details and choose your payment gateway to finalize order.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Shipping, Prescription & Payment forms -->
+    <div class="col-lg-7">
+      <!-- Shipping Address -->
+      <div class="card glass-card border-0 p-4 shadow mb-4">
+        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <span class="material-icons text-teal" style="color: #0d9488;">local_shipping</span>
+          <span>Delivery Details</span>
+        </h5>
+        <div class="mb-3">
+          <label for="address" class="form-label fw-semibold text-secondary small">Shipping/Drop Address</label>
+          <textarea
+            id="address"
+            name="shippingAddress"
+            class="form-control glass-input w-100"
+            rows="3"
+            placeholder="House No, Street, Landmark, City, Pincode"
+            [(ngModel)]="shippingAddress"
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Prescription Upload (Only visible if requiresPrescription is true) -->
+      @if (requiresPrescription()) {
+        <div class="card glass-card border-0 p-4 shadow mb-4" style="border-left: 5px solid #ef4444 !important;">
+          <h5 class="fw-bold text-danger mb-3 d-flex align-items-center gap-2">
+            <span class="material-icons text-danger">upload_file</span>
+            <span>Upload Medical Prescription Required</span>
+          </h5>
+          <p class="small text-muted mb-3">
+            One or more items (e.g. Antibiotics) require validation from a registered medical practitioner. Please upload a clear image of your doctor's prescription.
+          </p>
+
+          <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-4 bg-light text-center" style="border-style: dashed !important; border-radius: 12px; border-color: #cbd5e1 !important;">
+            <span class="material-icons text-muted mb-2" style="font-size: 2.5rem;">cloud_upload</span>
+            <input
+              type="file"
+              id="prescription"
+              class="d-none"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
+            <label for="prescription" class="btn btn-outline-teal btn-sm fw-medium px-4 cursor-pointer" style="border-color: #0d9488; color: #0d9488; cursor: pointer;">
+              Select Image file
+            </label>
+
+            @if (prescriptionName) {
+              <p class="small text-dark fw-semibold mt-3 mb-0 d-flex align-items-center gap-1">
+                <span class="material-icons text-success" style="font-size: 1rem;">check_circle</span>
+                <span>{{ prescriptionName }}</span>
+              </p>
+            }
+
+            @if (isUploadingPrescription()) {
+              <div class="d-flex align-items-center gap-2 mt-3 text-teal small">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Simulating file inspection...</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Payment Method -->
+      <div class="card glass-card border-0 p-4 shadow">
+        <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+          <span class="material-icons text-teal" style="color: #0d9488;">payment</span>
+          <span>Payment Gateway Options</span>
+        </h5>
+
+        <div class="d-flex gap-3 mb-4 flex-wrap">
+          <!-- Stripe Option -->
+          <div
+            class="flex-grow-1 border p-3 rounded-4 cursor-pointer d-flex align-items-center gap-3"
+            [style.border-color]="paymentMethod === 'Stripe' ? '#0d9488' : '#cbd5e1'"
+            [style.background]="paymentMethod === 'Stripe' ? '#f0fdfa' : 'white'"
+            (click)="paymentMethod = 'Stripe'"
+            style="cursor: pointer; transition: all 0.2s;"
+          >
+            <span class="material-icons text-primary" style="font-size: 2.2rem; color: #6366f1 !important;">credit_card</span>
+            <div>
+              <h6 class="fw-bold mb-0 text-dark">Stripe Checkout</h6>
+              <p class="small text-muted mb-0">Pay securely via Credit Card</p>
+            </div>
+          </div>
+
+          <!-- Razorpay Option -->
+          <div
+            class="flex-grow-1 border p-3 rounded-4 cursor-pointer d-flex align-items-center gap-3"
+            [style.border-color]="paymentMethod === 'Razorpay' ? '#0d9488' : '#cbd5e1'"
+            [style.background]="paymentMethod === 'Razorpay' ? '#f0fdfa' : 'white'"
+            (click)="paymentMethod = 'Razorpay'"
+            style="cursor: pointer; transition: all 0.2s;"
+          >
+            <span class="material-icons text-teal" style="font-size: 2.2rem; color: #0284c7 !important;">qr_code_2</span>
+            <div>
+              <h6 class="fw-bold mb-0 text-dark">Razorpay UPI</h6>
+              <p class="small text-muted mb-0">UPI, QR, or Netbanking</p>
+            </div>
+          </div>
+
+          <!-- COD Option -->
+          <div
+            class="flex-grow-1 border p-3 rounded-4 cursor-pointer d-flex align-items-center gap-3"
+            [style.border-color]="paymentMethod === 'COD' ? '#0d9488' : '#cbd5e1'"
+            [style.background]="paymentMethod === 'COD' ? '#f0fdfa' : 'white'"
+            (click)="paymentMethod = 'COD'"
+            style="cursor: pointer; transition: all 0.2s;"
+          >
+            <span class="material-icons text-secondary" style="font-size: 2.2rem; color: #475569 !important;">payments</span>
+            <div>
+              <h6 class="fw-bold mb-0 text-dark">Cash on Delivery</h6>
+              <p class="small text-muted mb-0">Pay on parcel arrival</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stripe Card Input Mocks -->
+        @if (paymentMethod === 'Stripe') {
+          <div class="p-3 border rounded-4 bg-light mb-2 animate-fade-in-up" style="border-radius: 12px;">
+            <h6 class="fw-bold text-dark mb-3 small uppercase-label">Stripe Credit Card Form</h6>
+            
+            <div class="mb-3">
+              <label for="cardNumber" class="form-label text-muted small">Card Number</label>
+              <input type="text" id="cardNumber" class="form-control glass-input w-100" placeholder="4242 4242 4242 4242" [(ngModel)]="cardNumber" name="cardNumber" />
+            </div>
+            
+            <div class="row">
+              <div class="col-6">
+                <label for="expiry" class="form-label text-muted small">Expiration (MM/YY)</label>
+                <input type="text" id="expiry" class="form-control glass-input w-100" placeholder="12/28" [(ngModel)]="cardExpiry" name="expiry" />
+              </div>
+              <div class="col-6">
+                <label for="cvc" class="form-label text-muted small">CVC Code</label>
+                <input type="text" id="cvc" class="form-control glass-input w-100" placeholder="123" [(ngModel)]="cardCvc" name="cvc" />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Razorpay UPI Mock details -->
+        @if (paymentMethod === 'Razorpay') {
+          <div class="p-3 border rounded-4 bg-light mb-2 animate-fade-in-up text-center" style="border-radius: 12px;">
+            <h6 class="fw-bold text-dark mb-2 small uppercase-label">Razorpay Fast Payments</h6>
+            <p class="small text-muted mb-0">Upon clicking checkout, a secure Razorpay QR Code modal will open to authenticate transaction.</p>
+          </div>
+        }
+
+        <!-- COD Description -->
+        @if (paymentMethod === 'COD') {
+          <div class="p-3 border rounded-4 bg-light mb-2 animate-fade-in-up" style="border-radius: 12px;">
+            <p class="small text-muted mb-0">Verify your address. A dispatch SMS verification will be sent once confirmed. Delivery fee applies.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right Column: Cart Item list details -->
+    <div class="col-lg-5">
+      <div class="card glass-card border-0 p-4 shadow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Order Details</h5>
+          
+          <!-- Dispensing Pharmacy details -->
+          <div class="p-3 border rounded-3 mb-4 bg-light" style="border-radius: 8px;">
+            <p class="small text-muted mb-0">Dispensing from: <strong>{{ selectedPharmacy()?.name }}</strong></p>
+          </div>
+
+          <!-- Items loop summary -->
+          <div class="d-flex flex-column gap-3 mb-4" style="max-height: 180px; overflow-y: auto;">
+            @for (item of items(); track item.medicineId) {
+              <div class="d-flex justify-content-between align-items-center small">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-teal-soft text-teal" style="background-color: #e6fbf7; color: #0d9488; font-size: 0.75rem;">x{{ item.quantity }}</span>
+                  <span class="fw-semibold text-dark">{{ item.name }}</span>
+                </div>
+                <span class="text-muted">₹{{ (item.price * item.quantity).toFixed(2) }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Total charges list -->
+          <div class="d-flex flex-column gap-2 border-top pt-3 border-bottom pb-3 mb-4 small">
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Items Subtotal</span>
+              <span class="fw-semibold">₹{{ cartSubtotal().toFixed(2) }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Delivery partner fee</span>
+              @if (getDeliveryFee() === 0) {
+                <span class="text-success fw-bold">FREE</span>
+              } @else {
+                <span class="fw-semibold">₹{{ getDeliveryFee().toFixed(2) }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="fw-bold text-dark">Payable Amount</span>
+            <h3 class="fw-bold text-teal mb-0" style="color: #0d9488;">₹{{ getTotal().toFixed(2) }}</h3>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+          (click)="submitOrder()"
+          [disabled]="isPlacingOrder()"
+        >
+          <span class="material-icons">verified_user</span>
+          <span>Pay & Place Order</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

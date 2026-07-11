@@ -1,0 +1,15 @@
+/* Medicine comparison specific stylesheet rules */
+.hover-card:hover {
+  border-color: #0d9488 !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08);
+}
+.bg-danger-soft {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.uppercase-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}

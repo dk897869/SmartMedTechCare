@@ -1,0 +1,165 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h1 class="fw-bold text-dark mb-2">AI Symptom Assistant</h1>
+      <p class="text-muted">Type or speak your symptoms below to analyze potential conditions with Gemini AI.</p>
+    </div>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <!-- Input Form Card -->
+    <div class="col-lg-8">
+      <div class="card glass-card border-0 p-4 shadow mb-4">
+        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-teal">
+          <span class="material-icons" style="color: #0d9488;">chat</span>
+          <span>Describe Your Symptoms</span>
+        </h5>
+        
+        <div class="position-relative mb-3">
+          <textarea
+            class="form-control glass-input w-100"
+            rows="4"
+            placeholder="Describe how you are feeling (e.g. 'I have had a mild fever and a dry cough since yesterday with muscle strain...')"
+            [(ngModel)]="symptomsText"
+            style="padding-right: 50px; font-size: 1.05rem;"
+          ></textarea>
+
+          <!-- Floating Mic Recording Button -->
+          <button
+            type="button"
+            class="btn position-absolute border-0 d-flex align-items-center justify-content-center"
+            [class.text-danger]="isRecording()"
+            [class.pulse-animation]="isRecording()"
+            (click)="toggleSpeech()"
+            style="bottom: 12px; right: 12px; border-radius: 50%; width: 42px; height: 42px; background: rgba(13, 148, 136, 0.1);"
+            title="Speak symptoms"
+          >
+            <span class="material-icons" style="font-size: 1.5rem;">
+              {{ isRecording() ? 'mic' : 'mic_none' }}
+            </span>
+          </button>
+        </div>
+
+        @if (isRecording()) {
+          <div class="d-flex align-items-center gap-2 mb-3 text-danger small fw-semibold">
+            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+            <span>Listening... Speak now and press microphone button again to finish.</span>
+          </div>
+        }
+
+        <button
+          type="button"
+          class="btn btn-premium w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+          (click)="submitDiagnosis()"
+          [disabled]="isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Gemini AI is analyzing symptoms...</span>
+          } @else {
+            <span class="material-icons">query_stats</span>
+            <span>Run AI Diagnosis</span>
+          }
+        </button>
+      </div>
+
+      <!-- AI Diagnosis Output Section -->
+      @if (diagnosisResult()) {
+        <div class="card glass-card border-0 p-4 shadow-lg animate-fade-in-up">
+          <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-4">
+            <h4 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+              <span class="material-icons text-teal" style="color: #0d9488;">analytics</span>
+              <span>AI Assessment Results</span>
+            </h4>
+            <span class="badge bg-teal" style="background-color: #0d9488; font-size: 0.85rem; padding: 6px 12px;">Gemini Stable</span>
+          </div>
+
+          <!-- Emergency Red Flag Alert Box -->
+          @if (diagnosisResult()?.emergencyRedFlag) {
+            <div class="alert alert-danger border-0 p-3 mb-4 d-flex align-items-start gap-3 bg-dark-danger" style="background-color: #fef2f2; border-left: 5px solid #ef4444 !important; border-radius: 12px; color: #b91c1c;">
+              <span class="material-icons text-danger" style="font-size: 2.2rem;">warning</span>
+              <div>
+                <h5 class="fw-bold mb-1">🚨 EMERGENCY RED FLAG DETECTED</h5>
+                <p class="mb-0 small" style="line-height: 1.5;">
+                  {{ diagnosisResult()?.emergencyAdvice }}
+                </p>
+              </div>
+            </div>
+          }
+
+          <!-- Conditions List -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-secondary mb-3 small uppercase-label">Possible Conditions</h5>
+            <div class="d-flex flex-column gap-3">
+              @for (condition of diagnosisResult()?.conditions; track condition.name) {
+                <div class="card p-3 border" style="border-radius: 12px; background: rgba(255,255,255,0.5);">
+                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                    <div>
+                      <h5 class="fw-bold text-dark mb-1">{{ condition.name }}</h5>
+                      <p class="text-muted small mb-0">{{ condition.explanation }}</p>
+                    </div>
+                    <!-- Confidence score badge -->
+                    <div class="text-end">
+                      <span class="badge badge-pill" [class.badge-success]="condition.confidence >= 70" [class.badge-warning]="condition.confidence < 70 && condition.confidence >= 50" [class.badge-danger]="condition.confidence < 50">
+                        {{ condition.confidence }}% Confidence
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Progres bar indicator -->
+                  <div class="progress" style="height: 8px; border-radius: 4px;">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      [style.width.%]="condition.confidence"
+                      [class.bg-success]="condition.confidence >= 70"
+                      [class.bg-warning]="condition.confidence < 70 && condition.confidence >= 50"
+                      [class.bg-danger]="condition.confidence < 50"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Suggested OTC Medicines -->
+          @if (diagnosisResult()?.conditions?.[0]?.otcMedicines?.length) {
+            <div class="mb-4">
+              <h5 class="fw-bold text-secondary mb-3 small uppercase-label">Suggested Over-The-Counter (OTC) Medicines</h5>
+              <div class="row g-3">
+                @for (med of diagnosisResult()?.conditions?.[0]?.otcMedicines; track med.name) {
+                  <div class="col-md-6">
+                    <div class="card p-3 h-100 border d-flex flex-column justify-content-between" style="border-radius: 12px; background: #f8fafc;">
+                      <div>
+                        <h6 class="fw-bold text-teal mb-2" style="color: #0f766e;">{{ med.name }}</h6>
+                        <p class="small text-muted mb-1">📋 <strong>Dosage:</strong> {{ med.dosage }}</p>
+                        <p class="small text-muted mb-0">⏱️ <strong>Duration:</strong> {{ med.duration }}</p>
+                      </div>
+                      
+                      <div class="mt-3 pt-2 border-top">
+                        <button
+                          type="button"
+                          class="btn btn-outline-teal btn-sm w-100 d-flex align-items-center justify-content-center gap-1"
+                          (click)="comparePrice(med.name)"
+                          style="border-color: #0d9488; color: #0d9488;"
+                        >
+                          <span class="material-icons" style="font-size: 1rem;">price_check</span>
+                          <span>Compare Pharmacy Prices</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Medical Disclaimer Warning Footer -->
+          <div class="alert alert-warning border-0 p-3 bg-light-warning mb-0" style="background-color: #fef3c7; border-left: 4px solid #f59e0b !important; color: #b45309; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;">
+            <strong>⚠️ Medical Safety Disclaimer:</strong> {{ diagnosisResult()?.generalDisclaimer }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

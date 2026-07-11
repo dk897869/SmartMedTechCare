@@ -1,0 +1,170 @@
+<div class="container py-5 animate-fade-in-up">
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h1 class="fw-bold text-dark mb-2">Medicine Price Comparison</h1>
+      <p class="text-muted">Search for any medicine and instantly compare costs across partner pharmacies.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Panel: Search & Medicine Grid -->
+    <div class="col-lg-6">
+      <div class="card glass-card border-0 p-4 shadow mb-4">
+        <!-- Search bar -->
+        <div class="d-flex gap-2 mb-3">
+          <input
+            type="text"
+            class="form-control glass-input flex-grow-1"
+            placeholder="Search by name, brand, active ingredients..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="fetchMedicines()"
+          />
+          <button class="btn btn-premium px-4" (click)="fetchMedicines()">
+            <span class="material-icons">search</span>
+          </button>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          @for (cat of categories; track cat) {
+            <button
+              type="button"
+              class="btn btn-sm px-3 py-2 fw-semibold"
+              [style.background-color]="selectedCategory === cat ? '#0d9488' : 'rgba(203, 213, 225, 0.4)'"
+              [style.color]="selectedCategory === cat ? 'white' : '#475569'"
+              style="border-radius: 20px; border: none; transition: all 0.2s;"
+              (click)="selectCategory(cat)"
+            >
+              {{ cat }}
+            </button>
+          }
+        </div>
+
+        <!-- Medicine Results Grid -->
+        @if (isLoading()) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-teal" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2 small">Searching catalog...</p>
+          </div>
+        } @else {
+          @if (medicines().length === 0) {
+            <div class="text-center py-5">
+              <span class="material-icons text-muted" style="font-size: 3rem;">search_off</span>
+              <p class="text-muted mt-2">No medicines found matching the search criteria.</p>
+            </div>
+          } @else {
+            <div class="row g-3">
+              @for (med of medicines(); track med._id) {
+                <div class="col-md-12">
+                  <div
+                    class="card p-3 border cursor-pointer hover-card d-flex flex-row align-items-center gap-3"
+                    [class.border-teal]="selectedMedicine()?._id === med._id"
+                    [style.background]="selectedMedicine()?._id === med._id ? '#f0fdfa' : 'white'"
+                    style="border-radius: 12px; transition: all 0.2s; cursor: pointer;"
+                    (click)="comparePrices(med)"
+                  >
+                    <img [src]="med.image" class="rounded object-fit-cover" alt="Medicine" style="width: 70px; height: 70px;">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h6 class="fw-bold mb-0 text-dark">{{ med.name }}</h6>
+                        @if (med.requiresPrescription) {
+                          <span class="badge bg-danger-soft text-danger" style="background-color: #fee2e2; color: #ef4444; font-size: 0.65rem;">Rx Required</span>
+                        }
+                      </div>
+                      <p class="small text-muted mb-1">{{ med.brand }} &bull; {{ med.category }}</p>
+                      <p class="small text-muted mb-0 text-truncate" style="max-width: 320px;">{{ med.description }}</p>
+                    </div>
+                    <span class="material-icons text-teal" style="color: #0d9488;">chevron_right</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Right Panel: Pharmacy Price Comparison Details -->
+    <div class="col-lg-6">
+      @if (selectedMedicine()) {
+        <div class="card glass-card border-0 p-4 shadow-lg animate-fade-in-up">
+          <div class="d-flex align-items-start gap-3 border-bottom pb-3 mb-4">
+            <img [src]="selectedMedicine()?.image" class="rounded object-fit-cover shadow-sm" alt="Selected Medicine" style="width: 80px; height: 80px;">
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <h4 class="fw-bold mb-0 text-dark">{{ selectedMedicine()?.name }}</h4>
+                @if (selectedMedicine()?.requiresPrescription) {
+                  <span class="badge bg-danger" style="font-size: 0.75rem;">Rx Required</span>
+                }
+              </div>
+              <p class="text-muted mb-1 small">{{ selectedMedicine()?.brand }} &bull; {{ selectedMedicine()?.category }}</p>
+              <a [routerLink]="['/medicines', selectedMedicine()?._id]" class="text-teal small fw-semibold" style="text-decoration: none; color: #0d9488;">View Full Ingredients & Side Effects &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Price comparison loader -->
+          @if (isComparing()) {
+            <div class="text-center py-5">
+              <div class="spinner-border text-teal" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="text-muted mt-2 small">Retrieving pharmacy prices...</p>
+            </div>
+          } @else {
+            <h5 class="fw-bold mb-3 small text-secondary uppercase-label">Available Prices by Pharmacy</h5>
+            
+            @if (listings().length === 0) {
+              <div class="alert alert-secondary text-center small py-4">
+                ⚠️ No partner pharmacy has active stock listings for this medicine currently.
+              </div>
+            } @else {
+              <div class="d-flex flex-column gap-3">
+                @for (listing of listings(); track listing._id) {
+                  <div class="card p-3 border d-flex flex-row justify-content-between align-items-center flex-wrap gap-3" style="border-radius: 12px; background: rgba(255,255,255,0.6);">
+                    <div>
+                      <h6 class="fw-bold text-dark mb-1">{{ listing.pharmacyId.name }}</h6>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-teal-soft text-teal" style="background-color: #e6fbf7; color: #0d9488; font-size: 0.7rem;">⭐ {{ listing.pharmacyId.rating }} Rating</span>
+                        <span class="text-muted small">📞 {{ listing.pharmacyId.contact }}</span>
+                      </div>
+                      <p class="text-muted small mb-0">{{ listing.pharmacyId.address }}</p>
+                    </div>
+
+                    <div class="text-end d-flex flex-column align-items-end gap-1">
+                      <h4 class="fw-bold text-teal mb-0" style="color: #0d9488;">₹{{ listing.price.toFixed(2) }}</h4>
+                      
+                      @if (listing.stock > 0) {
+                        <span class="badge bg-success-soft text-success small mb-2" style="background-color: #d1fae5; color: #065f46;">In Stock ({{ listing.stock }} left)</span>
+                      } @else {
+                        <span class="badge bg-danger-soft text-danger small mb-2" style="background-color: #fee2e2; color: #be123c;">Out of Stock</span>
+                      }
+
+                      <button
+                        type="button"
+                        class="btn btn-premium btn-sm d-flex align-items-center gap-1"
+                        (click)="addToCart(selectedMedicine()!, listing)"
+                        [disabled]="listing.stock <= 0"
+                        style="padding: 6px 14px; font-size: 0.85rem;"
+                      >
+                        <span class="material-icons" style="font-size: 1.05rem;">add_shopping_cart</span>
+                        <span>Add to Cart</span>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <div class="card glass-card border-0 p-5 shadow text-center text-muted d-flex flex-column align-items-center justify-content-center h-100" style="min-height: 350px;">
+          <span class="material-icons" style="font-size: 4rem; color: #cbd5e1;">compare</span>
+          <h5 class="fw-bold text-dark mt-3">Compare Prices</h5>
+          <p class="small text-muted" style="max-width: 320px;">Select a medicine from the list on the left to see price listings and availability across all regional pharmacies.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,202 @@
+<div class="container py-5 animate-fade-in-up">
+  <!-- Back button -->
+  <div class="mb-4">
+    <a routerLink="/orders" class="btn btn-light d-inline-flex align-items-center gap-1 border" style="border-radius: 20px;">
+      <span class="material-icons" style="font-size: 1.1rem;">arrow_back</span>
+      <span>Back to History</span>
+    </a>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12 text-center text-md-start">
+      <h1 class="fw-bold text-dark mb-1">Live Order Tracking</h1>
+      <p class="text-muted small">Tracking Order Ref: <span class="fw-bold text-dark" style="font-family: monospace;">{{ orderId }}</span></p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-teal" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-2 small">Connecting to GPS radar...</p>
+    </div>
+  } @else {
+    @if (trackingData()) {
+      <div class="row g-4">
+        <!-- Left Panel: Delivery Status Timeline -->
+        <div class="col-lg-5">
+          <div class="card glass-card border-0 p-4 shadow">
+            <h5 class="fw-bold text-dark border-bottom pb-2 mb-4 d-flex align-items-center gap-2">
+              <span class="material-icons text-teal" style="color: #0d9488;">assignment</span>
+              <span>Delivery Timeline</span>
+            </h5>
+
+            <!-- Delivery Progress Percentage -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <span class="small fw-semibold text-muted">Estimated Completion:</span>
+              <h5 class="fw-bold text-teal mb-0" style="color: #0d9488;">{{ trackingData()?.progress }}%</h5>
+            </div>
+
+            <!-- Milestone logs vertical timeline -->
+            <div class="position-relative ps-4" style="border-left: 2px solid #e2e8f0; margin-left: 10px;">
+              @for (log of trackingData()?.trackingHistory; track log.timestamp) {
+                <div class="position-relative mb-4">
+                  <!-- Timeline indicator dot -->
+                  <div
+                    class="position-absolute translate-middle-x rounded-circle border border-white"
+                    [style.background]="log.status === trackingData()?.status ? '#0d9488' : '#94a3b8'"
+                    style="left: -32px; top: 4px; width: 14px; height: 14px; border-width: 2px !important;"
+                  ></div>
+                  
+                  <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="fw-bold mb-1" [style.color]="log.status === trackingData()?.status ? '#0f766e' : '#1e293b'">
+                      {{ log.status }}
+                    </h6>
+                    <span class="text-muted small" style="font-size: 0.75rem;">{{ log.timestamp | date: 'shortTime' }}</span>
+                  </div>
+                  <p class="small text-muted mb-0">{{ log.message }}</p>
+                </div>
+              }
+            </div>
+
+            @if (trackingData()?.status === 'Delivered') {
+              <div class="alert alert-success border-0 p-3 mt-2 text-center" style="background-color: #d1fae5; color: #065f46; border-radius: 12px;">
+                🎉 <strong>Delivered!</strong> Your package has arrived. Stay safe and healthy!
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Right Panel: Live Map Tracker (SVG Canvas) -->
+        <div class="col-lg-7">
+          <div class="card glass-card border-0 p-4 shadow-lg text-center h-100 d-flex flex-column" style="min-height: 420px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                <span class="material-icons text-teal" style="color: #0d9488;">map</span>
+                <span>Active Delivery Path Map</span>
+              </h5>
+              
+              @if (trackingData()?.status !== 'Delivered' && trackingData()?.status !== 'Cancelled') {
+                <span class="badge bg-teal-soft text-teal pulse-animation px-3 py-2 fw-semibold" style="background-color: #e6fbf7; color: #0d9488; border-radius: 20px;">
+                  📡 Dispatch Live GPS Active
+                </span>
+              }
+            </div>
+
+            <!-- Map box -->
+            <div class="flex-grow-1 border rounded-4 position-relative overflow-hidden mb-3" style="background-color: #0f172a; min-height: 340px;">
+              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; top:0; left:0;">
+                <!-- Roads/Grid Mock backdrop -->
+                <line x1="0" y1="30" x2="100" y2="30" stroke="#1e293b" stroke-width="0.8" />
+                <line x1="0" y1="70" x2="100" y2="70" stroke="#1e293b" stroke-width="0.8" />
+                <line x1="40" y1="0" x2="40" y2="100" stroke="#1e293b" stroke-width="0.8" />
+                
+                @if (trackingData()) {
+                  <!-- Route path dotted line -->
+                  <line
+                    [attr.x1]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x"
+                    [attr.y1]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y"
+                    [attr.x2]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
+                    [attr.y2]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y"
+                    stroke="#475569"
+                    stroke-width="1.2"
+                    stroke-dasharray="1.5,1.5"
+                  />
+
+                  <!-- Origin Pharmacy Pin (Green) -->
+                  <circle
+                    [attr.cx]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x"
+                    [attr.cy]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y"
+                    r="4.5"
+                    fill="#10b981"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                  />
+
+                  <!-- Destination Home Pin (Blue) -->
+                  <circle
+                    [attr.cx]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
+                    [attr.cy]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y"
+                    r="4.5"
+                    fill="#3b82f6"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                  />
+
+                  <!-- Moving Rider Pin (Red/Teal pulse) -->
+                  <circle
+                    [attr.cx]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
+                    [attr.cy]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y"
+                    r="8"
+                    fill="#f43f5e"
+                    opacity="0.25"
+                    class="pulse-animation"
+                  />
+                  <circle
+                    [attr.cx]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
+                    [attr.cy]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y"
+                    r="3.5"
+                    fill="#f43f5e"
+                    stroke="#ffffff"
+                    stroke-width="0.75"
+                  />
+                }
+              </svg>
+
+              <!-- Location pins Labels overlay -->
+              @if (trackingData()) {
+                <!-- Pharmacy marker label -->
+                <div
+                  class="position-absolute px-2 py-1 rounded bg-dark border small text-white"
+                  [style.left.%]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).x - 10"
+                  [style.top.%]="getSvgCoords(trackingData()!.pharmacyLocation.lat, trackingData()!.pharmacyLocation.lng).y - 12"
+                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%); background: #1e293b !important; border-color: #475569 !important;"
+                >
+                  🏪 Pharmacy
+                </div>
+
+                <!-- Rider marker label -->
+                <div
+                  class="position-absolute px-2 py-1 rounded bg-danger text-white border"
+                  [style.left.%]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).x"
+                  [style.top.%]="getSvgCoords(trackingData()!.deliveryLocation.lat, trackingData()!.deliveryLocation.lng).y - 12"
+                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%);"
+                >
+                  🏍️ Rider
+                </div>
+
+                <!-- Home marker label -->
+                <div
+                  class="position-absolute px-2 py-1 rounded bg-primary text-white border"
+                  [style.left.%]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).x"
+                  [style.top.%]="getSvgCoords(trackingData()!.destinationLocation.lat, trackingData()!.destinationLocation.lng).y - 12"
+                  style="font-size: 0.65rem; white-space: nowrap; transform: translate(-50%, -100%);"
+                >
+                  🏠 Destination
+                </div>
+              }
+            </div>
+
+            <!-- Estimated Arrival statement -->
+            @if (trackingData()?.status !== 'Delivered') {
+              <p class="small text-muted mb-0">
+                🏍️ The delivery partner is driving along the route. Map positions update automatically in real-time.
+              </p>
+            } @else {
+              <p class="small text-success fw-bold mb-0">
+                ✅ Delivery Completed. Package delivered.
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="card p-5 text-center text-muted">
+        <span class="material-icons text-muted" style="font-size: 3rem;">gps_off</span>
+        <h5 class="fw-bold mt-2">No Tracking Information Available</h5>
+        <p class="small">The order tracking data could not be retrieved from the GPS server.</p>
+      </div>
+    }
+  }
+</div>
