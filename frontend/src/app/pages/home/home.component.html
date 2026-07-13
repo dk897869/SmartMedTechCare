@@ -231,6 +231,10 @@
       <div class="chat-footer">
         <input type="text" class="form-control glass-input flex-grow-1 py-2 px-3 border" 
                placeholder="Type symptoms or questions..." [(ngModel)]="chatInput" (keyup.enter)="sendChatMessage()" />
+        <button class="btn btn-light border p-2 d-flex align-items-center justify-content-center" 
+                [class.btn-danger]="isListeningVoice" (click)="toggleVoiceInput()" style="border-radius: 8px;" title="Voice Search">
+          <span class="material-icons text-secondary" style="font-size: 1.25rem;">{{ isListeningVoice ? 'mic' : 'mic_none' }}</span>
+        </button>
         <button class="btn btn-teal-premium p-2 d-flex align-items-center justify-content-center" (click)="sendChatMessage()">
           <span class="material-icons" style="font-size: 1.25rem;">send</span>
         </button>
@@ -246,9 +250,11 @@
   }
 
   <!-- Trigger circular button -->
-  <button class="chat-trigger-btn shadow-lg" (click)="toggleChat()">
-    <span class="material-icons" style="font-size: 2rem;">
-      {{ isChatOpen ? 'forum' : 'chat' }}
-    </span>
+  <button class="chat-trigger-btn shadow-lg" (click)="toggleChat()" style="overflow: hidden; padding: 0;">
+    @if (isChatOpen) {
+      <span class="material-icons text-primary" style="font-size: 1.8rem; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">close</span>
+    } @else {
+      <img src="/ai-agent-icon.png" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="AI Agent" />
+    }
   </button>
 </div>

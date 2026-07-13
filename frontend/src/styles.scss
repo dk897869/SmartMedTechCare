@@ -324,21 +324,22 @@ body {
 .chat-trigger-btn {
   width: 60px;
   height: 60px;
-  border-radius: 30px;
-  background: #f05252;
-  color: white;
-  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.8px solid #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(240, 82, 82, 0.4);
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.22);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .chat-trigger-btn:hover {
   transform: scale(1.08) rotate(5deg);
-  background: #e02424;
+  border-color: #1d4ed8;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.32);
 }
 
 .chat-bubble-expanded {
@@ -429,4 +430,25 @@ body {
   border-width: 6px 0 6px 6px;
   border-style: solid;
   border-color: transparent transparent transparent #1e293b;
+}
+
+/* Mobile Responsiveness for AI Agent Chatbot */
+@media (max-width: 576px) {
+  .floating-chat-widget {
+    bottom: 15px;
+    right: 15px;
+  }
+  .chat-bubble-expanded {
+    position: fixed;
+    bottom: 85px;
+    right: 15px;
+    left: 15px;
+    width: calc(100% - 30px) !important;
+    height: 75vh !important;
+    max-height: 480px;
+    z-index: 2000;
+  }
+  .chat-tooltip {
+    display: none !important; /* Hide tooltip on small screens to save space */
+  }
 }

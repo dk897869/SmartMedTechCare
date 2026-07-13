@@ -1,4 +1,4 @@
-const { analyzeSymptoms } = require("../services/aiService");
+const { analyzeSymptoms, chatWithAgent } = require("../services/aiService");
 
 // @desc    Analyze symptoms (AI assessment)
 // @route   POST /api/ai/diagnose
@@ -30,6 +30,36 @@ const diagnoseSymptoms = async (req, res) => {
   }
 };
 
+// @desc    Interactive AI Agent Chatbot
+// @route   POST /api/ai/chat
+// @access  Public
+const chatAssistant = async (req, res) => {
+  try {
+    const { message, history } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        message: "Message is required.",
+      });
+    }
+
+    const responseText = await chatWithAgent(message, history);
+
+    res.json({
+      success: true,
+      data: responseText,
+    });
+  } catch (error) {
+    console.error("AI Chat Controller Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred during chat processing.",
+    });
+  }
+};
+
 module.exports = {
   diagnoseSymptoms,
+  chatAssistant,
 };

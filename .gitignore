@@ -1,0 +1,24 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environments
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+backend/src/.env
+
+# Angular
+/dist
+/.angular
+
+# IDE
+.vscode/
+.idea/
+
+# Custom
+.gemini/
+antigravity/
