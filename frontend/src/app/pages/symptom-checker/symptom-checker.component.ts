@@ -84,10 +84,10 @@ export class SymptomCheckerComponent implements OnDestroy {
         if (res.success && res.data) {
           this.diagnosisResult.set(res.data);
           
-          if (res.data.emergencyRedFlag) {
+          if (res.data.requiresEmergencyCare) {
             Swal.fire({
               title: 'Emergency Warning!',
-              text: res.data.emergencyAdvice || 'Please seek immediate medical attention.',
+              text: res.data.medicalAdvice || 'Please seek immediate medical attention.',
               icon: 'warning',
               confirmButtonText: 'I Understand',
               confirmButtonColor: '#ef4444'

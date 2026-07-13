@@ -2,7 +2,7 @@
   <div class="row mb-4">
     <div class="col-12 text-center">
       <h1 class="fw-bold text-dark mb-2">AI Symptom Assistant</h1>
-      <p class="text-muted">Type or speak your symptoms below to analyze potential conditions with Gemini AI.</p>
+      <p class="text-muted">Type or speak your symptoms below to analyze potential conditions with SmartMed AI.</p>
     </div>
   </div>
 
@@ -55,7 +55,7 @@
         >
           @if (isLoading()) {
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            <span>Gemini AI is analyzing symptoms...</span>
+            <span>SmartMed AI is analyzing symptoms...</span>
           } @else {
             <span class="material-icons">query_stats</span>
             <span>Run AI Diagnosis</span>
@@ -71,17 +71,25 @@
               <span class="material-icons text-teal" style="color: #0d9488;">analytics</span>
               <span>AI Assessment Results</span>
             </h4>
-            <span class="badge bg-teal" style="background-color: #0d9488; font-size: 0.85rem; padding: 6px 12px;">Gemini Stable</span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge" 
+                    [class.bg-success]="diagnosisResult()?.severity === 'Low'" 
+                    [class.bg-warning]="diagnosisResult()?.severity === 'Medium'" 
+                    [class.bg-danger]="diagnosisResult()?.severity === 'High' || diagnosisResult()?.severity === 'Emergency'" 
+                    style="font-size: 0.85rem; padding: 6px 12px;">
+                Severity: {{ diagnosisResult()?.severity }}
+              </span>
+            </div>
           </div>
 
           <!-- Emergency Red Flag Alert Box -->
-          @if (diagnosisResult()?.emergencyRedFlag) {
+          @if (diagnosisResult()?.requiresEmergencyCare) {
             <div class="alert alert-danger border-0 p-3 mb-4 d-flex align-items-start gap-3 bg-dark-danger" style="background-color: #fef2f2; border-left: 5px solid #ef4444 !important; border-radius: 12px; color: #b91c1c;">
               <span class="material-icons text-danger" style="font-size: 2.2rem;">warning</span>
               <div>
                 <h5 class="fw-bold mb-1">🚨 EMERGENCY RED FLAG DETECTED</h5>
                 <p class="mb-0 small" style="line-height: 1.5;">
-                  {{ diagnosisResult()?.emergencyAdvice }}
+                  {{ diagnosisResult()?.medicalAdvice }}
                 </p>
               </div>
             </div>
@@ -91,12 +99,12 @@
           <div class="mb-4">
             <h5 class="fw-bold text-secondary mb-3 small uppercase-label">Possible Conditions</h5>
             <div class="d-flex flex-column gap-3">
-              @for (condition of diagnosisResult()?.conditions; track condition.name) {
+              @for (condition of diagnosisResult()?.possibleConditions; track condition.name) {
                 <div class="card p-3 border" style="border-radius: 12px; background: rgba(255,255,255,0.5);">
                   <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
                     <div>
                       <h5 class="fw-bold text-dark mb-1">{{ condition.name }}</h5>
-                      <p class="text-muted small mb-0">{{ condition.explanation }}</p>
+                      <p class="text-muted small mb-0">{{ condition.reason }}</p>
                     </div>
                     <!-- Confidence score badge -->
                     <div class="text-end">
@@ -106,7 +114,7 @@
                     </div>
                   </div>
 
-                  <!-- Progres bar indicator -->
+                  <!-- Progress bar indicator -->
                   <div class="progress" style="height: 8px; border-radius: 4px;">
                     <div
                       class="progress-bar"
@@ -123,17 +131,21 @@
           </div>
 
           <!-- Suggested OTC Medicines -->
-          @if (diagnosisResult()?.conditions?.[0]?.otcMedicines?.length) {
+          @if (diagnosisResult()?.recommendedOTCMedicines?.length) {
             <div class="mb-4">
               <h5 class="fw-bold text-secondary mb-3 small uppercase-label">Suggested Over-The-Counter (OTC) Medicines</h5>
               <div class="row g-3">
-                @for (med of diagnosisResult()?.conditions?.[0]?.otcMedicines; track med.name) {
+                @for (med of diagnosisResult()?.recommendedOTCMedicines; track med.name) {
                   <div class="col-md-6">
                     <div class="card p-3 h-100 border d-flex flex-column justify-content-between" style="border-radius: 12px; background: #f8fafc;">
                       <div>
                         <h6 class="fw-bold text-teal mb-2" style="color: #0f766e;">{{ med.name }}</h6>
+                        <p class="small text-muted mb-1">🎯 <strong>Purpose:</strong> {{ med.purpose }}</p>
                         <p class="small text-muted mb-1">📋 <strong>Dosage:</strong> {{ med.dosage }}</p>
-                        <p class="small text-muted mb-0">⏱️ <strong>Duration:</strong> {{ med.duration }}</p>
+                        <p class="small text-muted mb-1">⏱️ <strong>Duration:</strong> {{ med.duration }}</p>
+                        @if (med.warnings) {
+                          <p class="small text-danger mb-0">⚠️ <strong>Warnings:</strong> {{ med.warnings }}</p>
+                        }
                       </div>
                       
                       <div class="mt-3 pt-2 border-top">
@@ -154,9 +166,49 @@
             </div>
           }
 
+          <!-- Home Care Recommendations -->
+          @if (diagnosisResult()?.homeCare?.length) {
+            <div class="mb-4">
+              <h5 class="fw-bold text-secondary mb-2 small uppercase-label">Home Care Recommendations</h5>
+              <ul class="list-group list-group-flush border rounded" style="border-radius: 12px; overflow: hidden;">
+                @for (care of diagnosisResult()?.homeCare; track care) {
+                  <li class="list-group-item d-flex align-items-center gap-2 small">
+                    <span class="material-icons text-success" style="font-size: 1.1rem;">check_circle</span>
+                    <span>{{ care }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Clarifying Follow-Up Questions -->
+          @if (diagnosisResult()?.followUpQuestions?.length) {
+            <div class="mb-4">
+              <h5 class="fw-bold text-secondary mb-2 small uppercase-label">Clarifying Follow-Up Questions</h5>
+              <div class="p-3 bg-light rounded border text-slate small">
+                <p class="mb-2 fw-semibold">To refine this assessment, consider the following:</p>
+                <ul class="mb-0 ps-3">
+                  @for (q of diagnosisResult()?.followUpQuestions; track q) {
+                    <li class="mb-1">{{ q }}</li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
+
+          <!-- Medical Advice Summary -->
+          @if (diagnosisResult()?.medicalAdvice) {
+            <div class="mb-4">
+              <h5 class="fw-bold text-secondary mb-2 small uppercase-label">Recommended Next Steps</h5>
+              <p class="small text-dark mb-0 bg-light p-3 border rounded" style="line-height: 1.6;">
+                {{ diagnosisResult()?.medicalAdvice }}
+              </p>
+            </div>
+          }
+
           <!-- Medical Disclaimer Warning Footer -->
           <div class="alert alert-warning border-0 p-3 bg-light-warning mb-0" style="background-color: #fef3c7; border-left: 4px solid #f59e0b !important; color: #b45309; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;">
-            <strong>⚠️ Medical Safety Disclaimer:</strong> {{ diagnosisResult()?.generalDisclaimer }}
+            <strong>⚠️ Medical Safety Disclaimer:</strong> {{ diagnosisResult()?.disclaimer }}
           </div>
         </div>
       }

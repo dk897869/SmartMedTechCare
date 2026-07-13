@@ -5,20 +5,26 @@ import { Observable } from 'rxjs';
 export interface DiagnosisResponse {
   success: boolean;
   data: {
-    symptoms: string[];
-    conditions: Array<{
+    possibleConditions: Array<{
       name: string;
       confidence: number;
-      explanation: string;
-      otcMedicines: Array<{
-        name: string;
-        dosage: string;
-        duration: string;
-      }>;
+      reason: string;
     }>;
-    emergencyRedFlag: boolean;
-    emergencyAdvice: string;
-    generalDisclaimer: string;
+    severity: 'Low' | 'Medium' | 'High' | 'Emergency';
+    requiresDoctor: boolean;
+    requiresEmergencyCare: boolean;
+    redFlags: string[];
+    recommendedOTCMedicines: Array<{
+      name: string;
+      purpose: string;
+      dosage: string;
+      duration: string;
+      warnings: string;
+    }>;
+    homeCare: string[];
+    followUpQuestions: string[];
+    medicalAdvice: string;
+    disclaimer: string;
   };
 }
 
