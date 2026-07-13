@@ -9,7 +9,7 @@
   <div class="row g-4">
     <!-- Left Panel: Search & Medicine Grid -->
     <div class="col-lg-6">
-      <div class="card glass-card border-0 p-4 shadow mb-4">
+      <div class="card glass-card border-0 p-3 p-md-4 shadow mb-4">
         <!-- Search bar -->
         <div class="d-flex gap-2 mb-3">
           <input
@@ -66,7 +66,7 @@
                     (click)="comparePrices(med)"
                   >
                     <img [src]="med.image" class="rounded object-fit-cover" alt="Medicine" style="width: 70px; height: 70px;">
-                    <div class="flex-grow-1">
+                    <div class="flex-grow-1" style="min-width: 0;">
                       <div class="d-flex align-items-center gap-2 flex-wrap">
                         <h6 class="fw-bold mb-0 text-dark">{{ med.name }}</h6>
                         @if (med.requiresPrescription) {
@@ -74,7 +74,7 @@
                         }
                       </div>
                       <p class="small text-muted mb-1">{{ med.brand }} &bull; {{ med.category }}</p>
-                      <p class="small text-muted mb-0 text-truncate" style="max-width: 320px;">{{ med.description }}</p>
+                      <p class="small text-muted mb-0 text-truncate">{{ med.description }}</p>
                     </div>
                     <span class="material-icons text-teal" style="color: #0d9488;">chevron_right</span>
                   </div>

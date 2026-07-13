@@ -2,37 +2,37 @@
 <header class="navbar navbar-expand-lg navbar-light sticky-top" style="background: #ffffff; border-bottom: 1px solid #e2e8f0; z-index: 1030;">
   <div class="container py-1">
     <!-- Brand Logo -->
-    <a class="navbar-brand d-flex align-items-center fw-bold text-teal" routerLink="/" style="font-size: 1.4rem; color: #10b981; gap: 8px;">
+    <a class="navbar-brand d-flex align-items-center fw-bold text-teal" routerLink="/" style="font-size: 1.4rem; color: #10b981; gap: 8px;" (click)="closeMenu()">
       <span class="material-icons" style="font-size: 2rem; color: #10b981;">health_and_safety</span>
       <span>SmartMed<span style="color: #0f766e;">TechCare</span></span>
     </a>
 
-    <!-- Hamburger menu toggler for mobile -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <!-- Hamburger menu toggler for mobile (Uses Angular toggle) -->
+    <button class="navbar-toggler border-0 p-1" type="button" (click)="toggleMenu()" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="material-icons" style="font-size: 1.8rem; color: #475569;">{{ isMenuOpen ? 'close' : 'menu' }}</span>
     </button>
 
-    <!-- Navbar Links -->
-    <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-4 fw-semibold text-secondary">
+    <!-- Navbar Links & Action container -->
+    <div class="collapse navbar-collapse" [class.show]="isMenuOpen" id="mainNavbar">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-3 gap-lg-4 fw-semibold text-secondary pt-3 pt-lg-0">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/symptoms" routerLinkActive="active">Symptom Checker</a>
+          <a class="nav-link" routerLink="/symptoms" routerLinkActive="active" (click)="closeMenu()">Symptom Checker</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/medicines" routerLinkActive="active">Compare Medicines</a>
+          <a class="nav-link" routerLink="/medicines" routerLinkActive="active" (click)="closeMenu()">Compare Medicines</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/pharmacies" routerLinkActive="active">Nearby Stores</a>
+          <a class="nav-link" routerLink="/pharmacies" routerLinkActive="active" (click)="closeMenu()">Nearby Stores</a>
         </li>
       </ul>
 
       <!-- Navbar Actions (Cart & Auth Status) -->
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-lg-center align-items-start flex-column flex-lg-row gap-3 pt-2 pt-lg-0">
         <!-- Cart link -->
-        <a routerLink="/cart" class="position-relative p-2 text-dark d-flex align-items-center" style="text-decoration: none;">
+        <a routerLink="/cart" class="position-relative p-2 text-dark d-flex align-items-center" style="text-decoration: none;" (click)="closeMenu()">
           <span class="material-icons" style="font-size: 1.8rem; color: #475569;">shopping_cart</span>
           @if (cartService.cartCount() > 0) {
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-teal" style="background-color: #10b981; font-size: 0.75rem;">
@@ -43,27 +43,30 @@
 
         <!-- User Authentication Section -->
         @if (authService.isLoggedIn()) {
-          <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border" type="button" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px; padding: 6px 16px;">
-              <span class="material-icons" style="font-size: 1.2rem; color: #0d9488;">account_circle</span>
-              <span>{{ authService.currentUser()?.name }}</span>
+          <div class="dropdown w-100 w-lg-auto">
+            <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border w-100 w-lg-auto justify-content-between justify-content-lg-start" 
+                    type="button" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px; padding: 6px 16px;">
+              <div class="d-flex align-items-center gap-2">
+                <span class="material-icons" style="font-size: 1.2rem; color: #0d9488;">account_circle</span>
+                <span>{{ authService.currentUser()?.name }}</span>
+              </div>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="authDropdown" style="border-radius: 12px; min-width: 180px;">
               <li>
-                <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/profile">
+                <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/profile" (click)="closeMenu()">
                   <span class="material-icons text-secondary" style="font-size: 1.1rem;">person</span>
                   <span>My Profile</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/orders">
+                <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/orders" (click)="closeMenu()">
                   <span class="material-icons text-secondary" style="font-size: 1.1rem;">local_shipping</span>
                   <span>My Orders</span>
                 </a>
               </li>
               @if (authService.isAdmin()) {
                 <li>
-                  <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/admin">
+                  <a class="dropdown-item py-2 d-flex align-items-center gap-2" routerLink="/admin" (click)="closeMenu()">
                     <span class="material-icons text-secondary" style="font-size: 1.1rem;">admin_panel_settings</span>
                     <span>Admin Panel</span>
                   </a>
@@ -71,7 +74,7 @@
               }
               <li><hr class="dropdown-divider"></li>
               <li>
-                <button class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" (click)="logout()">
+                <button class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger w-100" (click)="logout(); closeMenu()">
                   <span class="material-icons text-danger" style="font-size: 1.1rem;">logout</span>
                   <span>Log Out</span>
                 </button>
@@ -79,8 +82,10 @@
             </ul>
           </div>
         } @else {
-          <a routerLink="/login" class="btn btn-outline-teal px-4" style="border-radius: 20px; border-color: #0d9488; color: #0d9488; font-weight: 500;">Login</a>
-          <a routerLink="/register" class="btn btn-premium px-4" style="border-radius: 20px; font-weight: 500;">Sign Up</a>
+          <div class="d-flex gap-2 w-100 w-lg-auto">
+            <a routerLink="/login" class="btn btn-outline-teal px-4 flex-grow-1 flex-lg-grow-0" style="border-radius: 20px; border-color: #0d9488; color: #0d9488; font-weight: 500;" (click)="closeMenu()">Login</a>
+            <a routerLink="/register" class="btn btn-premium px-4 flex-grow-1 flex-lg-grow-0" style="border-radius: 20px; font-weight: 500;" (click)="closeMenu()">Sign Up</a>
+          </div>
         }
       </div>
     </div>

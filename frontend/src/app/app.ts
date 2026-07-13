@@ -10,10 +10,20 @@ import { CartService } from './services/cart.service';
   styleUrl: './app.scss'
 })
 export class App {
+  isMenuOpen = false;
+
   constructor(
     public readonly authService: AuthService,
     public readonly cartService: CartService
   ) {}
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
 
   logout() {
     this.authService.logout();
